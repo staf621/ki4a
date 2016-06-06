@@ -1,0 +1,117 @@
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <PreferenceCategory
+        android:title="@string/pref_title_ssh_section"
+        android:layout="@layout/preference_divider" />
+
+    <EditTextPreference
+        android:defaultValue="@string/pref_default_ssh_server"
+        android:key="server_text"
+        android:maxLines="1"
+        android:selectAllOnFocus="true"
+        android:singleLine="true"
+        android:title="@string/pref_title_ssh_server" />
+
+    <EditTextPreference
+        android:defaultValue="@string/pref_default_ssh_port"
+        android:key="server_port"
+        android:numeric="integer"
+        android:selectAllOnFocus="true"
+        android:title="@string/pref_title_ssh_port" />
+
+    <EditTextPreference
+        android:defaultValue="@string/pref_default_ssh_username"
+        android:key="user_text"
+        android:maxLines="1"
+        android:selectAllOnFocus="true"
+        android:singleLine="true"
+        android:title="@string/pref_title_ssh_username" />
+
+    <EditTextPreference
+        android:defaultValue="@string/pref_default_ssh_password"
+        android:key="password_text"
+        android:maxLines="1"
+        android:selectAllOnFocus="true"
+        android:singleLine="true"
+        android:inputType="textPassword"
+        android:title="@string/pref_title_ssh_password" />
+
+    <SwitchPreference
+        android:defaultValue="false"
+        android:key="key_switch"
+        android:title="@string/pref_title_key"
+        android:summary="@string/pref_summary_key" />
+
+    <EditTextPreference
+        android:defaultValue="@string/pref_default_ssh_key"
+        android:key="key_text"
+        android:selectAllOnFocus="true"
+        android:singleLine="false"
+        android:title="@string/pref_title_ssh_key" />
+
+    <SwitchPreference
+        android:defaultValue="false"
+        android:key="compress_switch"
+        android:title="@string/pref_title_compress" />
+
+    <PreferenceCategory
+        android:title="@string/pref_title_proxy_section"
+        android:layout="@layout/preference_divider" />
+
+    <SwitchPreference
+        android:defaultValue="false"
+        android:key="proxy_switch"
+        android:title="@string/pref_title_proxy" />
+
+    <EditTextPreference
+        android:defaultValue="@string/pref_default_proxy_host"
+        android:key="proxy_host"
+        android:maxLines="1"
+        android:selectAllOnFocus="true"
+        android:singleLine="true"
+        android:title="@string/pref_title_proxy_host" />
+
+    <EditTextPreference
+        android:defaultValue="@string/pref_default_proxy_port"
+        android:key="proxy_port"
+        android:selectAllOnFocus="true"
+        android:singleLine="true"
+        android:numeric="integer"
+        android:title="@string/pref_title_proxy_port" />
+
+    <EditTextPreference
+        android:defaultValue="@string/pref_default_proxy_header"
+        android:key="proxy_header"
+        android:selectAllOnFocus="true"
+        android:singleLine="false"
+        android:summary="@string/pref_summary_proxy_header"
+        android:title="@string/pref_title_proxy_header" />
+
+    <PreferenceCategory
+        android:title="@string/pref_title_other_section"
+        android:layout="@layout/preference_divider" />
+
+    <SwitchPreference
+        android:defaultValue="false"
+        android:key="reconnect_switch"
+        android:title="@string/pref_title_auto_reconnect" />
+
+    <SwitchPreference
+        android:defaultValue="false"
+        android:key="cellular_switch"
+        android:title="@string/pref_title_cellular"
+        android:summary="@string/pref_summary_cellular" />
+
+    <SwitchPreference
+        android:defaultValue="false"
+        android:key="airplane_switch"
+        android:title="@string/pref_title_airplane"
+        android:summary="@string/pref_summary_airplane" />
+
+    <SwitchPreference
+        android:defaultValue="false"
+        android:key="iptables_switch"
+        android:title="@string/pref_title_iptables"
+        android:summary="@string/pref_summary_iptables" />
+
+</PreferenceScreen>

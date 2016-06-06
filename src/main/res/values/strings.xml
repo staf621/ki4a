@@ -1,0 +1,64 @@
+<resources>
+    <string name="app_name">Ki4a</string>
+    <string name="str_config">Status</string>
+    <string name="title_activity_settings">Settings</string>
+
+    <string name="pref_header_general">General</string>
+
+    <string name="pref_title_compress">Enable Compression</string>
+
+    <string name="pref_title_proxy">Enable HTTP Proxy</string>
+
+    <string name="pref_title_cellular">Cellular data mode</string>
+    <string name="pref_summary_cellular">Auto turn off WiFi on connect and use cellular network status for reconnects</string>
+    <string name="pref_title_auto_reconnect">Auto Reconnect</string>
+
+    <string name="pref_title_airplane">Airplane mode toggle</string>
+    <string name="pref_summary_airplane">Switch Airplane mode On/Off to reconnect cellular network (Root required!)</string>
+
+    <string name="pref_title_iptables">Use iptables instead of VPN</string>
+    <string name="pref_summary_iptables">Root required!</string>
+
+    <string name="pref_title_ssh_section">SSH Server</string>
+
+    <string name="pref_title_ssh_server">Address</string>
+    <string name="pref_default_ssh_server"></string>
+
+    <string name="pref_title_ssh_port">Port (default: 22)</string>
+    <string name="pref_default_ssh_port">22</string>
+
+    <string name="pref_title_ssh_username">Username</string>
+    <string name="pref_default_ssh_username"></string>
+
+    <string name="pref_title_ssh_password">Password</string>
+    <string name="pref_default_ssh_password"></string>
+
+    <string name="pref_title_ssh_key">Private Key</string>
+    <string name="pref_default_ssh_key"></string>
+
+    <string name="pref_title_key">Use Private Key</string>
+    <string name="pref_summary_key">Instead of password</string>
+
+    <string name="pref_title_proxy_section">HTTP Proxy</string>
+
+    <string name="pref_title_proxy_host">Address</string>
+    <string name="pref_default_proxy_host"></string>
+
+    <string name="pref_title_proxy_port">Port (default: 80)</string>
+    <string name="pref_default_proxy_port">80</string>
+
+    <string name="pref_title_proxy_header">Http Headers</string>
+    <string name="pref_default_proxy_header"></string>
+    <string name="pref_summary_proxy_header">Headers are sent to proxy after CONNECT and before SSH handshake</string>
+
+    <string name="text_status_initializing">Initializing...</string>
+    <string name="text_status_connected">Connected</string>
+    <string name="text_status_disconnected">Disconnected</string>
+    <string name="text_status_reconnecting">Reconnecting...</string>
+    <string name="text_status_connecting">Connecting...</string>
+    <string name="text_status_empty"/>
+
+    <string name="not_root_access">Could not get root access</string>
+    <string name="pref_title_other_section">Other options</string>
+
+</resources>

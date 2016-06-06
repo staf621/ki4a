@@ -1,0 +1,64 @@
+<resources>
+    <string name="app_name">Ki4a</string>
+    <string name="str_config">Estado</string>
+    <string name="title_activity_settings">Preferencias</string>
+
+    <string name="pref_header_general">General</string>
+
+    <string name="pref_title_compress">Habilitar Compresion</string>
+
+    <string name="pref_title_proxy">Habilitar servidor proxy</string>
+
+    <string name="pref_title_cellular">Modo red de datos móvil</string>
+    <string name="pref_summary_cellular">Deshabilitar WiFi al conectar y usar el estado de la red móvil para reconectar</string>
+    <string name="pref_title_auto_reconnect">Reconectar automáticamente</string>
+
+    <string name="pref_title_airplane">Prender/Apagar modo avión</string>
+    <string name="pref_summary_airplane">Alternar el estado del modo avión para reconectar la red móvil (Necesita permisos de Root!)</string>
+
+    <string name="pref_title_iptables">Utilizar iptables en vez de VPN</string>
+    <string name="pref_summary_iptables">Necesita permisos de Root!</string>
+
+    <string name="pref_title_ssh_section">Servidor SSH</string>
+
+    <string name="pref_title_ssh_server">Dirección</string>
+    <string name="pref_default_ssh_server"></string>
+
+    <string name="pref_title_ssh_port">Puerto (por defecto: 22)</string>
+    <string name="pref_default_ssh_port">22</string>
+
+    <string name="pref_title_ssh_username">Usuario</string>
+    <string name="pref_default_ssh_username"></string>
+
+    <string name="pref_title_ssh_password">Contraseña</string>
+    <string name="pref_default_ssh_password"></string>
+
+    <string name="pref_title_ssh_key">Llave privada</string>
+    <string name="pref_default_ssh_key"></string>
+
+    <string name="pref_title_key">Utilizar llave privada</string>
+    <string name="pref_summary_key">En vez de password</string>
+
+    <string name="pref_title_proxy_section">Proxy HTTP</string>
+
+    <string name="pref_title_proxy_host">Dirección</string>
+    <string name="pref_default_proxy_host"></string>
+
+    <string name="pref_title_proxy_port">Puerto (por defecto: 80)</string>
+    <string name="pref_default_proxy_port">80</string>
+
+    <string name="pref_title_proxy_header">Http Headers</string>
+    <string name="pref_default_proxy_header"></string>
+    <string name="pref_summary_proxy_header">Los encabezados HTTP son evniados al proxy despúes del encabezado CONNECT y antes del saludo de SSH</string>
+
+    <string name="text_status_initializing">Iniciando...</string>
+    <string name="text_status_connected">Conectado</string>
+    <string name="text_status_disconnected">Desconectado</string>
+    <string name="text_status_reconnecting">Reconectando...</string>
+    <string name="text_status_connecting">Conectando...</string>
+    <string name="text_status_empty"/>
+
+    <string name="not_root_access">No se puede obtener permisos de Root</string>
+    <string name="pref_title_other_section">Otras opciones</string>
+
+</resources>
