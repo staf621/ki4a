@@ -1,0 +1,64 @@
+<resources>
+    <string name="app_name">Ki4a</string>
+    <string name="str_config">状态</string>
+    <string name="title_activity_settings">设置</string>
+
+    <string name="pref_header_general">综合</string>
+
+    <string name="pref_title_compress">启动压缩</string>
+
+    <string name="pref_title_proxy">启动 HTTP 代理</string>
+
+    <string name="pref_title_cellular">蜂窝数据模式</string>
+    <string name="pref_summary_cellular">自动关闭WIFI 并且使用蜂窝网络重新连接</string>
+    <string name="pref_title_auto_reconnect">自动重连</string>
+
+    <string name="pref_title_airplane">切换飞行模式</string>
+    <string name="pref_summary_airplane">切换飞行模式来重新连接蜂窝网络（需要root权限）</string>
+
+    <string name="pref_title_iptables">使用iptables，不使用VPN</string>
+    <string name="pref_summary_iptables">需要root权限</string>
+
+    <string name="pref_title_ssh_section">SSH 服务器</string>
+
+    <string name="pref_title_ssh_server">地址</string>
+    <string name="pref_default_ssh_server"></string>
+
+    <string name="pref_title_ssh_port">端口 (默认: 22)</string>
+    <string name="pref_default_ssh_port">22</string>
+
+    <string name="pref_title_ssh_username">用户名</string>
+    <string name="pref_default_ssh_username"></string>
+
+    <string name="pref_title_ssh_password">密码</string>
+    <string name="pref_default_ssh_password"></string>
+
+    <string name="pref_title_ssh_key">个人密钥</string>
+    <string name="pref_default_ssh_key"></string>
+
+    <string name="pref_title_key">使用个人密钥</string>
+    <string name="pref_summary_key">不使用密码</string>
+
+    <string name="pref_title_proxy_section">HTTP 代理</string>
+
+    <string name="pref_title_proxy_host">地址</string>
+    <string name="pref_default_proxy_host"></string>
+
+    <string name="pref_title_proxy_port">端口 (默认: 80)</string>
+    <string name="pref_default_proxy_port">80</string>
+
+    <string name="pref_title_proxy_header">Http头</string>
+    <string name="pref_default_proxy_header"></string>
+    <string name="pref_summary_proxy_header">Http 头会在连接之后，SSH握手之前被发送到代理</string>
+
+    <string name="text_status_initializing">初始化中...</string>
+    <string name="text_status_connected">已连接</string>
+    <string name="text_status_disconnected">已断连</string>
+    <string name="text_status_reconnecting">重新连接中...</string>
+    <string name="text_status_connecting">连接中...</string>
+    <string name="text_status_empty"/>
+
+    <string name="not_root_access">无法获得root权限</string>
+    <string name="pref_title_other_section">其他选择</string>
+
+</resources>
