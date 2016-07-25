@@ -2,7 +2,8 @@
 
     <PreferenceCategory
         android:title="@string/pref_title_ssh_section"
-        android:layout="@layout/preference_divider" />
+        android:layout="@layout/preference_divider"
+        android:key="preferences"/>
 
     <EditTextPreference
         android:defaultValue="@string/pref_default_ssh_server"
@@ -38,15 +39,22 @@
 
     <SwitchPreference
         android:defaultValue="false"
+        android:key="ask_pass_switch"
+        android:title="@string/pref_title_ask_pass"
+        android:summary="@string/pref_summary_ask_pass" />
+
+    <SwitchPreference
+        android:defaultValue="false"
         android:key="key_switch"
         android:title="@string/pref_title_key"
         android:summary="@string/pref_summary_key" />
 
-    <EditTextPreference
+    <com.staf621.ki4a.EditTextDialogPreference
         android:defaultValue="@string/pref_default_ssh_key"
         android:key="key_text"
         android:selectAllOnFocus="true"
         android:singleLine="false"
+        android:summary="@string/pref_summary_ssh_key"
         android:title="@string/pref_title_ssh_key" />
 
     <SwitchPreference
@@ -88,8 +96,38 @@
         android:title="@string/pref_title_proxy_header" />
 
     <PreferenceCategory
+        android:title="@string/pref_title_forwarding_section"
+        android:layout="@layout/preference_divider" />
+
+    <SwitchPreference
+        android:defaultValue="true"
+        android:key="dns_switch"
+        android:title="@string/pref_title_dns" />
+
+    <EditTextPreference
+        android:defaultValue="@string/pref_default_dns_server"
+        android:key="dns_server"
+        android:selectAllOnFocus="true"
+        android:singleLine="true"
+        android:title="@string/pref_title_dns_server" />
+
+    <Preference
+        android:key="forward_button"
+        android:title="@string/pref_forward"/>
+
+    <SwitchPreference
+        android:defaultValue="true"
+        android:key="route_switch"
+        android:title="@string/pref_all_traffic" />
+
+    <Preference
+        android:key="route_button"
+        android:title="@string/pref_specific_routes"/>
+
+    <PreferenceCategory
         android:title="@string/pref_title_other_section"
         android:layout="@layout/preference_divider" />
+
 
     <SwitchPreference
         android:defaultValue="false"
@@ -113,5 +151,13 @@
         android:key="iptables_switch"
         android:title="@string/pref_title_iptables"
         android:summary="@string/pref_summary_iptables" />
+
+    <Preference
+        android:key="log_button"
+        android:title="@string/application_log"/>
+
+    <Preference
+        android:key="about_button"
+        android:title="@string/pref_about"/>
 
 </PreferenceScreen>

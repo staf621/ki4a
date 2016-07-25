@@ -33,8 +33,12 @@
     <string name="pref_title_ssh_password">Password</string>
     <string name="pref_default_ssh_password"></string>
 
+    <string name="pref_title_ask_pass">Ask for password when connecting</string>
+    <string name="pref_summary_ask_pass"></string>
+
     <string name="pref_title_ssh_key">Private Key</string>
     <string name="pref_default_ssh_key"></string>
+    <string name="pref_summary_ssh_key">OpenSSH format</string>
 
     <string name="pref_title_key">Use Private Key</string>
     <string name="pref_summary_key">Instead of password</string>
@@ -56,9 +60,39 @@
     <string name="text_status_disconnected">Disconnected</string>
     <string name="text_status_reconnecting">Reconnecting...</string>
     <string name="text_status_connecting">Connecting...</string>
-    <string name="text_status_empty"/>
+    <string name="text_status_empty" />
 
     <string name="not_root_access">Could not get root access</string>
     <string name="pref_title_other_section">Other options</string>
+
+    <string name="pref_about">About</string>
+    <string name="application_log">Application Log</string>
+    <string name="str_connect">Connect</string>
+    <string name="str_key_passphrase">Private key passphrase</string>
+    <string name="str_import">Import</string>
+    <string name="str_incorrect_password">Incorrect password</string>
+    <string name="str_failed_to_connect">Failed to connect</string>
+
+    <string name="pref_title_dns">Enable DNS Forwarding</string>
+    <string name="pref_title_dns_server">DNS Server (default: 8.8.8.8)</string>
+    <string name="pref_default_dns_server">8.8.8.8</string>
+
+    <string name="pref_title_forwarding_section">Forwarding options</string>
+    <string name="pref_forward">Port Forwarding</string>
+    <string name="forward_src_port">Src Port</string>
+    <string name="forward_dest_host">Destination Host</string>
+    <string name="forward_dest_port">Dst Port</string>
+    <string name="forward_local">Local</string>
+    <string name="forward_remote">Remote</string>
+
+    <string name="pref_all_traffic">Send all traffic over VPN</string>
+    <string name="pref_specific_routes">Route specific subnets</string>
+
+    <string name="route_text">Route (e.g. 0.0.0.0)</string>
+    <string name="route_prefix_text">Prefix length</string>
+
+    <string name="refresh_log">Refresh</string>
+    <string name="copy_log">Copy</string>
+    <string name="email_log">Send e-mail</string>
 
 </resources>

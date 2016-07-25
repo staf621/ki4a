@@ -17,7 +17,7 @@
 package eu.chainfire.libsuperuser;
 
 import android.os.Looper;
-import android.util.Log;
+import com.staf621.ki4a.MyLog;
 
 /**
  * Utility class for logging and debug features that (by default) does nothing when not in debug mode
@@ -84,7 +84,8 @@ public class Debug {
             if (logListener != null) {
                 logListener.onLog(type, typeIndicator, message);
             } else {
-                Log.d(TAG, "[" + TAG + "][" + typeIndicator + "]" + (!message.startsWith("[") && !message.startsWith(" ") ? " " : "") + message);
+                message = message.replaceFirst("sshpass -p \".*?\"","sshpass -p ********");
+                MyLog.d(TAG, "[" + TAG + "][" + typeIndicator + "]" + (!message.startsWith("[") && !message.startsWith(" ") ? " " : "") + message);
             }
         }
     }	

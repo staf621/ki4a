@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:layout_marginTop="10dp">
+
+    <RadioGroup
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/radios"
+        android:orientation="horizontal">
+
+        <RadioButton
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/forward_local"
+            android:id="@+id/local_Radio"
+            android:textColor="@color/colorTextDarkBackground"
+            android:checked="true" />
+
+        <RadioButton
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/forward_remote"
+            android:id="@+id/remote_Radio"
+            android:textColor="@color/colorTextDarkBackground"
+            android:checked="false" />
+
+    </RadioGroup>
+
+    <EditText
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/source_Port"
+        android:hint="@string/forward_src_port"
+        android:minWidth="80dip"
+        android:maxWidth="80dip"
+        android:inputType="number"
+        android:singleLine="true"
+        android:textColor="@color/colorTextDarkBackground"
+        android:textColorHint="@color/colorTextDarkBackgroundSecondary"
+        android:layout_below="@+id/radios" />
+
+    <EditText
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/dest_Host"
+        android:hint="@string/forward_dest_host"
+        android:minWidth="150dip"
+        android:maxWidth="150dip"
+        android:layout_below="@+id/radios"
+        android:inputType="textNoSuggestions"
+        android:textColor="@color/colorTextDarkBackground"
+        android:textColorHint="@color/colorTextDarkBackgroundSecondary"
+        android:layout_toRightOf="@+id/source_Port" />
+
+    <EditText
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/dest_Port"
+        android:hint="@string/forward_dest_port"
+        android:minWidth="80dip"
+        android:maxWidth="80dip"
+        android:inputType="number"
+        android:singleLine="true"
+        android:layout_below="@+id/radios"
+        android:textColor="@color/colorTextDarkBackground"
+        android:textColorHint="@color/colorTextDarkBackgroundSecondary"
+        android:layout_toRightOf="@+id/dest_Host" />
+
+    <Button
+        style="?android:attr/buttonStyleSmall"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/delete_button"
+        android:background="@android:drawable/ic_menu_delete"
+        android:layout_alignParentRight="true"
+        android:layout_marginTop="10dp"/>
+
+
+</RelativeLayout>

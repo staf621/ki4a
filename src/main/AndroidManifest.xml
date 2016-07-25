@@ -4,9 +4,11 @@
 
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
-    <uses-permission android:name="android.permission.CHANGE_NETWORK_STATE"/>
-    <uses-permission android:name="android.permission.ACCESS_WIFI_STATE"/>
-    <uses-permission android:name="android.permission.CHANGE_WIFI_STATE"/>
+    <uses-permission android:name="android.permission.CHANGE_NETWORK_STATE" />
+    <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
+    <uses-permission android:name="android.permission.CHANGE_WIFI_STATE" />
+    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.READ_PHONE_STATE" />
 
     <application
         android:allowBackup="true"
@@ -16,7 +18,7 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
         <activity
-            android:name="com.staf621.ki4a.SplashScreenActivity"
+            android:name=".SplashScreenActivity"
             android:label="@string/app_name">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -25,22 +27,33 @@
             </intent-filter>
         </activity>
         <activity
-            android:name="com.staf621.ki4a.MainActivity"
+            android:name=".MainActivity"
             android:label="@string/app_name" />
-
         <activity
             android:name=".SettingsActivity"
             android:label="@string/title_activity_settings" />
 
-        <service android:enabled="true" android:name=".ki4aService" />
+        <activity
+            android:name=".ForwardActivity"
+            android:label="@string/pref_forward"
+            android:windowSoftInputMode="adjustPan"/>
 
-        <service android:name=".ki4aVPNService"
+        <activity
+            android:name=".RouteActivity"
+            android:label="@string/pref_specific_routes"
+            android:windowSoftInputMode="adjustPan"/>
+
+        <service
+            android:name=".ki4aService"
+            android:enabled="true" />
+        <service
+            android:name=".ki4aVPNService"
+            android:exported="false"
             android:label="@string/app_name"
-            android:permission="android.permission.BIND_VPN_SERVICE"
-            android:exported="false">
-                <intent-filter>
-                    <action android:name="android.net.VpnService"/>
-                </intent-filter>
+            android:permission="android.permission.BIND_VPN_SERVICE">
+            <intent-filter>
+                <action android:name="android.net.VpnService" />
+            </intent-filter>
         </service>
 
         <receiver android:name=".ki4aUpdateReceiver">
@@ -49,6 +62,15 @@
             </intent-filter>
         </receiver>
 
+        <activity
+            android:name=".AboutActivity"
+            android:label="@string/pref_about"/>
+
+        <activity
+            android:name=".ShowLogActivity"
+            android:label="@string/application_log"/>
+
+        <activity android:name=".KeyImport" android:launchMode="singleTop" />
     </application>
 
 </manifest>

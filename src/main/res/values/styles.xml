@@ -8,6 +8,24 @@
         <item name="android:textColorPrimary">@color/primary_text_color_selector</item>
         <item name="android:textColorSecondary">@color/secondary_text_color_selector</item>
         <item name="android:background">@color/colorDarkBackground</item>
+        <item name="android:alertDialogTheme">@style/AlertDialogTheme</item>
+        <item name="android:actionBarStyle">@style/ActionBarTheme</item>
+        <!-- backward compatibility -->
+        <item name="actionBarStyle">@style/ActionBarTheme</item>
+    </style>
+
+    <style name="ActionBarTheme" parent="@style/Widget.AppCompat.Light.ActionBar.Solid.Inverse">
+        <item name="popupTheme">@style/ActionBarPopupTheme</item>
+    </style>
+
+    <style name="ActionBarPopupTheme">
+        <item name="android:textColor">@color/primary_text_color_selector</item>
+    </style>
+
+    <style name="AlertDialogTheme" parent="Theme.AppCompat.Light.Dialog.Alert">
+        <item name="android:textColor">@color/colorTextDarkBackground</item>
+        <item name="android:windowMinWidthMajor">@android:dimen/dialog_min_width_major</item>
+        <item name="android:windowMinWidthMinor">@android:dimen/dialog_min_width_minor</item>
     </style>
 
     <style name="Divider">

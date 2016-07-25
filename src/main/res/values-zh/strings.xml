@@ -33,8 +33,12 @@
     <string name="pref_title_ssh_password">密码</string>
     <string name="pref_default_ssh_password"></string>
 
+    <string name="pref_title_ask_pass">连接时询问密码</string>
+    <string name="pref_summary_ask_pass"></string>
+
     <string name="pref_title_ssh_key">个人密钥</string>
     <string name="pref_default_ssh_key"></string>
+    <string name="pref_summary_ssh_key">OpenSSH格式</string>
 
     <string name="pref_title_key">使用个人密钥</string>
     <string name="pref_summary_key">不使用密码</string>
@@ -60,5 +64,35 @@
 
     <string name="not_root_access">无法获得root权限</string>
     <string name="pref_title_other_section">其他选择</string>
+
+    <string name="pref_about">关于</string>
+    <string name="application_log">Application Log</string>
+    <string name="str_connect">连</string>
+    <string name="str_key_passphrase">私钥密码</string>
+    <string name="str_import">进口</string>
+    <string name="str_incorrect_password">密码不正确</string>
+    <string name="str_failed_to_connect">Failed to connect</string>
+
+    <string name="pref_title_dns">Enable DNS Forwarding</string>
+    <string name="pref_title_dns_server">DNS Server (default: 8.8.8.8)</string>
+    <string name="pref_default_dns_server">8.8.8.8</string>
+    <string name="pref_title_forwarding_section">Forwarding options</string>
+
+    <string name="pref_forward">转发端口</string>
+    <string name="forward_src_port">Src Port</string>
+    <string name="forward_dest_host">Destination Host</string>
+    <string name="forward_dest_port">Dst Port</string>
+    <string name="forward_local">本地</string>
+    <string name="forward_remote">远程</string>
+
+    <string name="route_text">Route (e.g. 0.0.0.0)</string>
+    <string name="route_prefix_text">Prefix length</string>
+
+    <string name="pref_all_traffic">Send all traffic over VPN</string>
+    <string name="pref_specific_routes">Route specific subnets</string>
+
+    <string name="refresh_log">Refresh</string>
+    <string name="copy_log">Copy</string>
+    <string name="email_log">Send e-mail</string>
 
 </resources>

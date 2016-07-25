@@ -2,7 +2,9 @@ package com.staf621.ki4a;
 
 
 import android.annotation.TargetApi;
+import android.app.AlertDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.res.Configuration;
 import android.os.Build;
@@ -13,14 +15,12 @@ import android.preference.Preference;
 import android.preference.PreferenceActivity;
 import android.preference.PreferenceFragment;
 import android.preference.PreferenceManager;
+import android.preference.SwitchPreference;
 import android.support.v7.app.ActionBar;
-import android.util.Log;
 import android.view.KeyEvent;
 import android.view.MenuItem;
-import android.view.View;
 
 import java.io.FileOutputStream;
-import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.List;
 
@@ -49,8 +49,14 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
     protected static Preference proxy_header;
     protected static Preference ssh_password;
     protected static Preference ssh_key;
+    protected static Preference ssh_ask_pass;
+    protected static Preference key_switch;
     protected static Preference iptables_switch;
     protected static Preference airplane_switch;
+    protected static Preference route_switch;
+    protected static Preference route_button;
+    protected static Preference dns_server;
+    protected static Context myContext;
 
 
     private static Preference.OnPreferenceChangeListener sBindPreferenceSummaryToValueListener = new Preference.OnPreferenceChangeListener() {
@@ -82,7 +88,7 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
                     out.flush();
                     out.close();
                 } catch (Exception e) {
-                    Log.e(TAG, "Exception creating header file", e);
+                    MyLog.e(TAG, "Exception creating header file", e);
                 }
             }
             else if(preference.getKey().equals("key_text"))
@@ -96,7 +102,7 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
                     out.flush();
                     out.close();
                 } catch (Exception e) {
-                    Log.e(TAG, "Exception creating ssh key file", e);
+                    MyLog.e(TAG, "Exception creating ssh key file", e);
                 }
             }
             else
@@ -129,14 +135,35 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
             }
             else if(preference.getKey().equals("key_switch"))
             {
+                //Let's reset saved passwords
+                ki4aService.got_ssh_pass = false;
+                ki4aService.current_ssh_pass = "";
                 if((boolean) value) {
                     ssh_password.setEnabled(false);
+                    ssh_ask_pass.setEnabled(false);
                     ssh_key.setEnabled(true);
                 }
                 else
                 {
                     ssh_password.setEnabled(true);
+                    ssh_ask_pass.setEnabled(true);
                     ssh_key.setEnabled(false);
+                }
+            }
+            else if(preference.getKey().equals("ask_pass_switch"))
+            {
+                //Let's reset saved passwords
+                ki4aService.got_ssh_pass = false;
+                ki4aService.current_ssh_pass = "";
+                SwitchPreference key_switch_pref = (SwitchPreference) key_switch;
+                if((boolean) value) {
+                    ssh_password.setEnabled(false);
+                    key_switch.setEnabled(false);
+                }
+                else
+                {
+                    if(!key_switch_pref.isChecked()) ssh_password.setEnabled(true);
+                    key_switch.setEnabled(true);
                 }
             }
             else if(preference.getKey().equals("cellular_switch"))
@@ -147,6 +174,39 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
                 else
                 {
                     airplane_switch.setEnabled(false);
+                }
+            }
+            else if(preference.getKey().equals("dns_switch"))
+            {
+                if((boolean) value) {
+                    dns_server.setEnabled(true);
+                }
+                else
+                {
+                    dns_server.setEnabled(false);
+                }
+            }
+            else if(preference.getKey().equals("iptables_switch"))
+            {
+                if((boolean) value) {
+                    route_switch.setEnabled(false);
+                    route_button.setEnabled(false);
+                }
+                else
+                {
+                    SwitchPreference route_switch_pref = (SwitchPreference) route_switch;
+                    route_switch.setEnabled(true);
+                    route_button.setEnabled(!route_switch_pref.isChecked());
+                }
+            }
+            else if(preference.getKey().equals("route_switch"))
+            {
+                if((boolean) value) {
+                    route_button.setEnabled(false);
+                }
+                else
+                {
+                    route_button.setEnabled(true);
                 }
             }
             return true;
@@ -203,6 +263,7 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
         getFragmentManager().beginTransaction()
                 .replace(android.R.id.content, new GeneralPreferenceFragment ())
                 .commit();
+        myContext = this;
     }
 
     /**
@@ -271,8 +332,13 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
             proxy_header = findPreference("proxy_header");
             ssh_key = findPreference("key_text");
             ssh_password = findPreference("password_text");
+            ssh_ask_pass = findPreference("ask_pass_switch");
             iptables_switch = findPreference("iptables_switch");
             airplane_switch = findPreference("airplane_switch");
+            key_switch = findPreference("key_switch");
+            dns_server = findPreference("dns_server");
+            route_switch = findPreference("route_switch");
+            route_button = findPreference("route_button");
 
             bindPreferenceSummaryToValue(findPreference("server_text"));
             bindPreferenceSummaryToValue(findPreference("server_port"));
@@ -281,14 +347,59 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
             bindPreferenceSummaryToValue(proxy_port);
             bindPreferenceSummaryToValue(proxy_header);
             bindPreferenceSummaryToValue(ssh_key);
+            bindPreferenceSummaryToValue(dns_server);
 
-            bindPreferenceEnabler(findPreference("key_switch"));
+            bindPreferenceEnabler(key_switch);
+            bindPreferenceEnabler(ssh_ask_pass);
+            bindPreferenceEnabler(route_switch);
+            bindPreferenceEnabler(iptables_switch);
             bindPreferenceEnabler(findPreference("proxy_switch"));
             bindPreferenceEnabler(findPreference("cellular_switch"));
+            bindPreferenceEnabler(findPreference("dns_switch"));
 
             //Enable/Disable iptables switch when connected/disconnected
             if(ki4aService.current_status==Util.STATUS_DISCONNECT) iptables_switch.setEnabled(true);
             else iptables_switch.setEnabled(false);
+
+            Preference button = findPreference("about_button");
+            button.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
+                @Override
+                public boolean onPreferenceClick(Preference preference) {
+                    Intent intent = new Intent().setClass(myContext, AboutActivity.class);
+                    startActivity(intent);
+                    return true;
+                }
+            });
+
+            Preference button2 = findPreference("forward_button");
+            button2.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
+                @Override
+                public boolean onPreferenceClick(Preference preference) {
+                    Intent intent = new Intent().setClass(myContext, ForwardActivity.class);
+                    startActivity(intent);
+                    return true;
+                }
+            });
+
+            Preference button3 = findPreference("log_button");
+            button3.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
+                @Override
+                public boolean onPreferenceClick(Preference preference) {
+                    Intent intent = new Intent().setClass(myContext, ShowLogActivity.class);
+                    startActivity(intent);
+                    return true;
+                }
+            });
+
+            Preference button4 = findPreference("route_button");
+            button4.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
+                @Override
+                public boolean onPreferenceClick(Preference preference) {
+                    Intent intent = new Intent().setClass(myContext, RouteActivity.class);
+                    startActivity(intent);
+                    return true;
+                }
+            });
         }
     }
 }

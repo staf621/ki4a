@@ -1,7 +1,9 @@
 package com.staf621.ki4a;
 
+import android.app.AlertDialog;
 import android.content.BroadcastReceiver;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.SharedPreferences;
@@ -10,10 +12,14 @@ import android.os.StrictMode;
 import android.preference.PreferenceManager;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.text.InputType;
+import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.inputmethod.EditorInfo;
+import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.TextView;
 
@@ -35,6 +41,10 @@ public class MainActivity extends AppCompatActivity {
                         MainActivity.refresh_status_img(ki4aService.current_status);
                     }
                 });
+            }
+            else if(intent.getAction().equals(ki4aService.ASK_FOR_PASS_INTENT)) {
+                MyLog.d(Util.TAG,"Got intent for pass request!");
+                ask_for_pass(context);
             }
         }
     }
@@ -92,8 +102,10 @@ public class MainActivity extends AppCompatActivity {
 
                 if (!iptables_switch) {
                     // Ask for VPN permission
+                    MyLog.i(Util.TAG, "Asking for permission to use VPN");
                     Intent intentVpn = VpnService.prepare(myMainActivity);
                     if (intentVpn != null) {
+                        MyLog.i(Util.TAG, "First time VPN permission, asking...");
                         startActivityForResult(intentVpn, 0);
                     }
                     else
@@ -135,7 +147,9 @@ public class MainActivity extends AppCompatActivity {
 
         // Re-register to Service Updates
         if (dataUpdateReceiver == null) dataUpdateReceiver = new DataUpdateReceiver();
-        IntentFilter intentFilter = new IntentFilter(ki4aService.REFRESH_STATUS_INTENT);
+        IntentFilter intentFilter = new IntentFilter();
+        intentFilter.addAction(ki4aService.REFRESH_STATUS_INTENT);
+        intentFilter.addAction(ki4aService.ASK_FOR_PASS_INTENT);
         registerReceiver(dataUpdateReceiver, intentFilter);
     }
 
@@ -176,5 +190,49 @@ public class MainActivity extends AppCompatActivity {
             text_status.setText(R.string.text_status_connected);
             button.setImageResource(R.drawable.status_blue);
         }
+    }
+
+    protected static void ask_for_pass(Context context)
+    {
+        final EditText pass = new EditText(context);
+        int title = PreferenceManager.
+                getDefaultSharedPreferences(context).
+                getBoolean("key_switch", false) ?
+                R.string.str_key_passphrase : R.string.pref_title_ssh_password;
+        pass.setSingleLine(true);
+        pass.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_PASSWORD);
+        pass.setImeOptions(EditorInfo.IME_ACTION_DONE);
+
+        final AlertDialog dialog = new AlertDialog.Builder(context)
+                .setTitle(title)
+                .setView(pass)
+                .setCancelable(false)
+                .setPositiveButton(R.string.str_connect, new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int whichButton) {
+                        ki4aService.current_ssh_pass = pass.getText().toString();
+                        ki4aService.got_ssh_pass = true;
+                    }
+                })
+                .show();
+
+        pass.setOnKeyListener(new TextView.OnKeyListener() {
+            public boolean onKey(View v, int keyCode, KeyEvent event) {
+                if (keyCode == KeyEvent.KEYCODE_ENTER) {
+                    dialog.getButton(DialogInterface.BUTTON_POSITIVE).performClick();
+                }
+                return false;
+            }
+        });
+        pass.setOnEditorActionListener(new TextView.OnEditorActionListener() {
+            @Override
+            public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
+                if (actionId == EditorInfo.IME_ACTION_DONE) {
+                    dialog.getButton(DialogInterface.BUTTON_POSITIVE).performClick();
+                }
+                return true;
+            }
+        });
+
+        pass.requestFocus();
     }
 }

@@ -16,7 +16,6 @@ import android.os.IBinder;
 import android.os.Message;
 import android.support.v4.app.NotificationCompat;
 import android.telephony.TelephonyManager;
-import android.util.Log;
 import android.widget.Toast;
 import android.content.SharedPreferences;
 import android.preference.PreferenceManager;
@@ -38,12 +37,19 @@ public class ki4aService extends Service {
     protected static final int MAX_FAIL_ATTEMPTS_FOR_RECONNECT = 10;
     protected static int current_fail_attempt = 0;
     protected static final int MAX_RETRY = 30; // Aprox 60 secs
+    protected static final int ASK_PASSWORD_TIMEOUT = 120; // 120 secs
     protected static int toState = 0;
     protected static final String REFRESH_STATUS_INTENT = "ki4aRefresh";
     protected static final String TOGGLE_STATUS_INTENT = "ki4aStatusToggle";
+    protected static final String ASK_FOR_PASS_INTENT = "ki4aAskForPass";
     protected static final int NOTIFICATION_ID = 7;
     protected static boolean first_connect = true;
     protected static boolean vpn_ready = false;
+    protected static String current_ssh_pass;
+    protected static boolean got_ssh_pass = false;
+    protected static final int INCORRECT_PASSWORD = 5;
+    protected static final int SSH_ERROR_CONNECTING = 255;
+    protected static final String GOOGLE_DNS = "8.8.8.8";
 
     protected static SSHThread ssht;
     protected static Wait4connection w4c;
@@ -93,7 +99,7 @@ public class ki4aService extends Service {
             // Only send Volatile notification if it's the first time connected
             showAToast(getString(R.string.text_status_connected), first_connect);
 
-            Log.d(Util.TAG, "Wait4connection: connection detected" + (first_connect ? " [first connection]" : ""));
+            MyLog.d(Util.TAG, "Wait4connection: connection detected" + (first_connect ? " [first connection]" : ""));
             if(first_connect) first_connect = false;
 
             notification.setContentText(getString(R.string.text_status_connected));
@@ -117,10 +123,10 @@ public class ki4aService extends Service {
 
         @Override
         public void run() {
-            Log.d(Util.TAG,"Starting new wait4connection");
+            MyLog.d(Util.TAG,"Starting new wait4connection");
             int i;
 
-            if(!preferences.getBoolean("iptables_switch",true)) {
+            if(!preferences.getBoolean("iptables_switch",false)) {
                 for (i = 0; i < 20; i++) {
                     if (vpn_ready) break;
                     if (Thread.currentThread().isInterrupted()) return;
@@ -136,7 +142,7 @@ public class ki4aService extends Service {
             for (i = 0; i < MAX_RETRY; i++) {
                 if (current_status == Util.STATUS_DISCONNECT) return; //We disconected
                 if(Thread.currentThread().isInterrupted()) return;
-                Log.d(Util.TAG, "Wait4connection: verifying connectivity...");
+                MyLog.d(Util.TAG, "Wait4connection: verifying connectivity...");
                 if (Util.isOnline(myContext)) {
                     reportConnected();
                     return;
@@ -161,11 +167,31 @@ public class ki4aService extends Service {
         @Override
         public void run() {
             boolean got_disconnected = false;
+            int ssh_return_val = 0;
             current_fail_attempt = 0;
+            boolean key_switch = preferences.getBoolean("key_switch",false);
+            boolean ask_pass = preferences.getBoolean("ask_pass_switch",false);
+            boolean enc_ssh_key = (key_switch && Util.isKeyEncrypted(preferences.getString("key_text", "")));
+
+            //If we are asking for password, let's wait
+            if(ask_pass || enc_ssh_key) {
+                //Now, we wait for the pass
+                for(int x=0; x< ASK_PASSWORD_TIMEOUT; x++)
+                {
+                    if(got_ssh_pass) break;
+                    try {
+                        Thread.sleep(1000);
+                    } catch (InterruptedException e) { }
+                }
+            }
+
             while( current_status != Util.STATUS_DISCONNECT && (current_fail_attempt <
                     (first_connect ? MAX_FAIL_ATTEMPTS_FOR_NEW:MAX_FAIL_ATTEMPTS_FOR_RECONNECT)) ) {
 
-                if(preferences.getBoolean("cellular_switch",true)) {
+                //We didn't receive the pass
+                if((ask_pass || enc_ssh_key) && !got_ssh_pass) break;
+
+                if(preferences.getBoolean("cellular_switch",false)) {
                     // If Telephony Manager says we are Disconnected and in the previous check we
                     // were disconnected for the same reason, let's break now
                     if (telephonyManager.getDataState() != telephonyManager.DATA_CONNECTED &&
@@ -184,14 +210,24 @@ public class ki4aService extends Service {
                 int proxy_port = Integer.parseInt(preferences.getString("proxy_port", "80"));
                 boolean compress = preferences.getBoolean("compress_switch", false);
                 boolean proxy = preferences.getBoolean("proxy_switch",false);
-                boolean key_switch = preferences.getBoolean("key_switch",false);
                 boolean iptables_switch = preferences.getBoolean("iptables_switch", false);
+                boolean dns_switch = preferences.getBoolean("dns_switch",true);
+                String dns_server = preferences.getString("dns_server", GOOGLE_DNS);
+                String forward_string = ForwardList.getForwardString(myContext);
 
-                //Start DNS redirect
-                Util.runChainFireCommand(Util.BASE + Util.BASE_BIN + "/pdnsd -c " + Util.BASE + "/pdnsd.conf -d", false);
+                //if ask_pass or private encrypted key we should get pass here
+                if(ask_pass || enc_ssh_key) {
+                    //We should have ssh pass inside current_ssh_pass instead of password_text
+                    password_text = current_ssh_pass;
+                }
+
+                if(dns_switch) {
+                    //Start DNS redirect
+                    Util.runChainFireCommand(Util.BASE + Util.BASE_BIN + "/pdnsd -c " + Util.BASE + "/pdnsd.conf -d", false);
+                }
 
                 // If we are on VPN mode, we need to start it also
-                if (!preferences.getBoolean("iptables_switch", true)) {
+                if (!preferences.getBoolean("iptables_switch", false)) {
                     Util.startKi4aVPN(myContext, getPackageName());
                     vpn_ready = false;
                 }
@@ -204,10 +240,11 @@ public class ki4aService extends Service {
                 w4cT.start();
 
                 if(toState == Util.STATUS_SOCKS) {
-                    Util.runChainFireCommand(
-                            (key_switch ? "" : BASE + BASE_BIN + "/sshpass -p \"" + password_text + "\" ")
+                    ssh_return_val = Util.runChainFireCommand(
+                            ((key_switch && !enc_ssh_key) ? "" : BASE + BASE_BIN + "/sshpass -p \"" + password_text + "\" ")
                                     + BASE + BASE_BIN + "/ssh " + server_text + " -p " + port_number + " -l " + user_text
-                                    + " -NT -g -D " + Util.localSocksPort + " -L 127.0.0.1:8163:8.8.8.8:53"
+                                    + " -NT -g -D " + Util.localSocksPort + (dns_switch?" -L 127.0.0.1:8163:"+dns_server+":53":"")
+                                    + forward_string
                                     + (key_switch ? " -i \"" + BASE + "/id_rsa\"" : "")
                                     + (compress ? " -C" : "")
                                     + " -o \"ProxyCommand " + BASE + BASE_BIN + "/korkscrew"
@@ -216,12 +253,19 @@ public class ki4aService extends Service {
                                     + " --proxyport " + proxy_port + " --desthost %h --destport %p"
                                     + " --headerfile " + BASE + "/header_file" + "\" -o \"KeepAlive yes\" -o \"ServerAliveInterval 15\""
                                     : " --directconnection --desthost %h --destport %p\"")
-                                    + " -o \"StrictHostKeyChecking=no\" -o \"GlobalKnownHostsFile=/dev/null\"", false);
+                                    + " -o \"StrictHostKeyChecking=no\" -o \"GlobalKnownHostsFile=/dev/null\"", false, true);
                 }
                 // Connection got closed
 
                 // Stop the wait 4 connection thread
                 if(w4cT!=null) w4cT.interrupt();
+
+                if(ssh_return_val == INCORRECT_PASSWORD) {
+                    got_ssh_pass = false;
+                    current_ssh_pass = "";
+                    showAToast(getString(R.string.str_incorrect_password),false);
+                    break;
+                }
 
                 if(current_status == Util.STATUS_DISCONNECT) // We were told to disconnect
                     break;
@@ -232,7 +276,7 @@ public class ki4aService extends Service {
 
                 if(!preferences.getBoolean("reconnect_switch",true)) break; // We do not want to reconnect
 
-                if(preferences.getBoolean("cellular_switch",true)) {
+                if(preferences.getBoolean("cellular_switch",false)) {
                     // We disconnected because Telephony Manager says we are disconnected
                     // let's flag it and sleep 10 more secs.
                     if (telephonyManager.getDataState() != telephonyManager.DATA_CONNECTED &&
@@ -263,7 +307,7 @@ public class ki4aService extends Service {
                 sendBroadcast(new Intent(REFRESH_STATUS_INTENT));
 
                 // If we are on VPN mode, we need to restart it also
-                if (!preferences.getBoolean("iptables_switch", true))
+                if (!preferences.getBoolean("iptables_switch", false))
                     Util.stopKi4aVPN(myContext, getPackageName());
 
                 // Stop DNS redirect
@@ -319,7 +363,7 @@ public class ki4aService extends Service {
     public int onStartCommand(Intent intent, int flags, int startId) {
         super.onStartCommand(intent, flags, startId);
 
-        Log.d(Util.TAG, "Service received a request! toState=" + toState + ", current_status=" + current_status);
+        MyLog.d(Util.TAG, "Service received a request! toState=" + toState + ", current_status=" + current_status);
         if(toState==Util.STATUS_INIT) // This call was made by App the first time it's started
         {
             // Do nothing
@@ -343,6 +387,8 @@ public class ki4aService extends Service {
         }
 
         return START_NOT_STICKY;
+        //return START_STICKY;
+        //return START_REDELIVER_INTENT;
     }
 
     @Override
@@ -358,7 +404,7 @@ public class ki4aService extends Service {
         cleanAll();
 
         if (dataUpdateReceiver != null) unregisterReceiver(dataUpdateReceiver);
-        Log.d(Util.TAG, "Destroy service called!");
+        MyLog.d(Util.TAG, "Destroy service called!");
     }
 
     protected void start_socks()
@@ -375,7 +421,7 @@ public class ki4aService extends Service {
             return;
         }
 
-        if(preferences.getBoolean("cellular_switch",true))
+        if(preferences.getBoolean("cellular_switch",false))
             Util.prepareInterfaces(wifiManager, telephonyManager);
 
         if(iptables_switch) {
@@ -398,9 +444,9 @@ public class ki4aService extends Service {
                     out_ip = ip;
                     Util.runChainFireRootCommand(BASE + BASE_BIN + "/iptables -t nat -A OUTPUT -d " + out_ip + " -j RETURN", true); //out ip
                 } else
-                    Log.e(Util.TAG, "Got Null hostname IP");
+                    MyLog.e(Util.TAG, "Got Null hostname IP");
             } catch (UnknownHostException e) {
-                Log.e(Util.TAG, "Can not get hostname IP");
+                MyLog.e(Util.TAG, "Can not get hostname IP");
             }
 
             //Start iptables Redirect
@@ -412,7 +458,8 @@ public class ki4aService extends Service {
                             BASE + BASE_BIN + "/iptables -t nat -A OUTPUT -d 192.168.0.0/16 -j RETURN;" +
                             BASE + BASE_BIN + "/iptables -t nat -A OUTPUT -d 224.0.0.0/4 -j RETURN;" +
                             BASE + BASE_BIN + "/iptables -t nat -A OUTPUT -d 240.0.0.0/4 -j RETURN;" +
-                            BASE + BASE_BIN + "/iptables -t nat -A OUTPUT -p udp --dport 53 -j REDIRECT --to-ports 8153;" +
+                            BASE + BASE_BIN + "/iptables -t nat -A OUTPUT -p udp --dport 53 -j " +
+                                    (preferences.getBoolean("dns_switch",true)? "REDIRECT --to-ports 8153;": "RETURN;") +
                             BASE + BASE_BIN + "/iptables -t nat -A OUTPUT -p tcp -j REDIRECT --to-ports 8123;" +
                             BASE + BASE_BIN + "/iptables -t filter -F FORWARD;" + // Hotspot sharing rules
                             BASE + BASE_BIN + "/iptables -t nat -F POSTROUTING;" +
@@ -427,6 +474,21 @@ public class ki4aService extends Service {
             Util.runChainFireRootCommand(BASE + BASE_BIN + "/redsocks -c " + BASE + "/redsocks.conf &", true);
         }
 
+        //If ask_pass_switch is set or
+        //ff we are using private key, let's check if it's encrypted, so we can ask for passphrase
+        if(!got_ssh_pass &&
+                (preferences.getBoolean("ask_pass_switch",false) ||
+                    (preferences.getBoolean("key_switch",false) &&
+                        Util.isKeyEncrypted(preferences.getString("key_text", ""))
+                    )
+                )
+           )
+        {
+            //I need to ask for pass before trying to create SSH Thread
+            // Notify MainActivity about ask for pass
+            sendBroadcast(new Intent(ASK_FOR_PASS_INTENT));
+        }
+
         new Thread(ssht).start();
 
     }
@@ -439,12 +501,19 @@ public class ki4aService extends Service {
         sendBroadcast(new Intent(REFRESH_STATUS_INTENT));
         showAToast(getString(R.string.text_status_disconnected), true);
 
+        //if we have pass saved, let's erase it unless it's a key passphrase
+        if(!preferences.getBoolean("key_switch",false)) {
+            got_ssh_pass = false;
+            current_ssh_pass = "";
+        }
+
         if (w4cT != null) {
             w4cT.interrupt();
         }
 
         Util.runChainFireCommand(BASE + BASE_BIN + "/busybox killall -9 korkscrew;" + // Stop korkscrew
                 BASE + BASE_BIN + "/busybox killall -9 ssh;" + // Stop SSH
+                BASE + BASE_BIN + "/busybox killall -9 sshpass;" +
                 BASE + BASE_BIN + "/busybox killall pdnsd", true); // Stop DNS redirect
 
         if(iptables_switch) {
@@ -482,7 +551,7 @@ public class ki4aService extends Service {
         msg.obj = message;
         handler.sendMessage(msg);
 
-        Log.d(Util.TAG, message);
+        MyLog.d(Util.TAG, message);
 
         if(volatile_notify)
         {

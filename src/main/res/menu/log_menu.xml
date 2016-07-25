@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <item
+        android:id="@+id/refresh_log"
+        android:title="@string/refresh_log"/>
+    <item
+        android:id="@+id/copy_log"
+        android:title="@string/copy_log"/>
+    <item
+        android:id="@+id/email_log"
+        android:title="@string/email_log"/>
+</menu>

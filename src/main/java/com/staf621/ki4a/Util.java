@@ -9,9 +9,7 @@ import android.net.LocalSocketAddress;
 import android.net.NetworkInfo;
 import android.net.wifi.WifiManager;
 import android.telephony.TelephonyManager;
-import android.util.Log;
 
-import java.io.DataOutputStream;
 import java.io.File;
 import java.io.FileDescriptor;
 import java.io.FileOutputStream;
@@ -43,45 +41,60 @@ public class Util {
 
     public static boolean hasRoot()
     {
-        Process process = null;
-        DataOutputStream os = null;
+        final boolean[] hasRoot = new boolean[1];
+        Thread t = new Thread(){
+            @Override
+            public void run(){
+                hasRoot[0] = Shell.SU.available();
+            }
+        };
+        t.start();
         try {
-            process = Runtime.getRuntime().exec("su");
-            os = new DataOutputStream(process.getOutputStream());
-            os.writeBytes("exit\n");
-            os.flush();
-            process.waitFor();
-        } catch (Exception e) {
-            Log.e(TAG, e.toString());
-            return false;
-        } finally {
-            try {
-                if (os != null) {
-                    os.close();
-                }
-                process.destroy();
-            } catch (Exception e) { }
+            t.join();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
         }
-        return true;
+        return hasRoot[0];
     }
 
-    public static void runChainFireRootCommand(String command, boolean fork) {
-        runChainFireCommand(command, true, fork);
+    public static int runChainFireRootCommand(String command, boolean fork) {
+        return runChainFireCommand(command, true, fork, false);
     }
 
-    public static void runChainFireCommand(String command, boolean fork) {
-        runChainFireCommand(command, false, fork);
+    public static int runChainFireCommand(String command, boolean fork, boolean ask4retval) {
+        return runChainFireCommand(command, false, fork, ask4retval);
     }
 
-    public static void runChainFireCommand(String command, boolean root, boolean fork) {
+    public static int runChainFireCommand(String command, boolean fork) {
+        return runChainFireCommand(command, false, fork, false);
+    }
+
+    public static int runChainFireCommand(String command, boolean root, boolean fork, boolean ask4retval) {
+        final int[] retval = new int[1];
         if(fork)
         {
             final String myCommand = command;
             final boolean myRoot = root;
+            final boolean myAsk4retval = ask4retval;
             Thread t = new Thread(){
                 @Override
                 public void run(){
-                    Shell.run((myRoot?"su":"sh"),new String[]{myCommand}, new String[]{},false);
+                    if(myRoot) {
+                        Shell.run("su", new String[]{myCommand}, new String[]{}, false);
+                        retval[0] = 0;
+                    }
+                    else {
+                        if(myAsk4retval) {
+                            try {
+                                retval[0] = Integer.parseInt(Shell.run("sh", new String[]{myCommand + "; echo $?"}, new String[]{}, false).get(0));
+                            } catch (Exception e) {
+                                retval[0] = 0;
+                            }
+                        } else {
+                            Shell.run("sh", new String[]{myCommand}, new String[]{}, false);
+                            retval[0] = 0;
+                        }
+                    }
                 }
             };
             t.start();
@@ -91,8 +104,25 @@ public class Util {
                 e.printStackTrace();
             }
         }
-        else
-            Shell.run((root?"su":"sh"),new String[]{command}, new String[]{},false);
+        else {
+            if(root) {
+                Shell.run("su", new String[]{command}, new String[]{}, false);
+                retval[0] = 0;
+            }
+            else {
+                if(ask4retval) {
+                    try {
+                        retval[0] = Integer.parseInt((Shell.run("sh", new String[]{command + "; echo $?"}, new String[]{}, false)).get(0));
+                    } catch (Exception e) {
+                        retval[0] = 0;
+                    }
+                } else {
+                    Shell.run("sh", new String[]{command + "; echo $?"}, new String[]{}, false);
+                    retval[0] = 0;
+                }
+            }
+        }
+        return retval[0];
     }
 
     protected static boolean isOnline(Context context)
@@ -109,9 +139,9 @@ public class Util {
                     return true;
                 }
             } catch (MalformedURLException e1) {
-                Log.d(TAG, "Couldn't connect [Malformed] " + e1.toString());
+                MyLog.i(TAG, "Couldn't connect [Malformed] " + e1.toString());
             } catch (IOException e) {
-                Log.d(TAG, "Couldn't connect " + e.toString());
+                MyLog.i(TAG, "Couldn't connect " + e.toString());
             }
         }
         return false;
@@ -176,7 +206,7 @@ public class Util {
                 }
             }
         } catch (IOException ex) {
-            Log.e(TAG, "I/O Exception", ex);
+            MyLog.e(TAG, "I/O Exception", ex);
         }
     }
 
@@ -197,7 +227,7 @@ public class Util {
             out.flush();
             out.close();
         } catch (Exception e) {
-            Log.e(TAG, "Exception when copying asset", e);
+            MyLog.e(TAG, "Exception when copying asset", e);
         }
     }
 
@@ -210,7 +240,7 @@ public class Util {
                 if (children[i].equals("id_rsa") ||
                         children[i].equals("header_file"))
                     continue;
-                Log.d(TAG, "Deleting = " + children[i]);
+                MyLog.d(TAG, "Deleting = " + children[i]);
                 deleteDir(new File(ki4a_folder, children[i]));
             }
         }
@@ -266,16 +296,16 @@ public class Util {
                         "chmod 755 " + BASE + BASE_BIN + "/pdnsd",true);
     }
 
-    protected static boolean run_tun2socks(FileDescriptor tunfd)
+    protected static boolean run_tun2socks(FileDescriptor tunfd, boolean forward_dns)
     {
         String localSocksFile = BASE + "/tunfd_file";
         Util.runChainFireCommand(BASE + BASE_BIN + "/tun2socks --netif-ipaddr " + socksVPN_IP +
                 " --netif-netmask " + tunVPN_mask + " --socks-server-addr 127.0.0.1:" + localSocksPort +
-                " --tunmtu " + tunVPN_MTU + " --dnsgw " + tunVPN_IP + ":8153 --pid " + BASE + "/tun2socks.pid",false);
+                " --tunmtu " + tunVPN_MTU + (forward_dns? " --dnsgw " + tunVPN_IP + ":8153 ":"") + " --pid " + BASE + "/tun2socks.pid", false);
         //--dnsgw " + tunVPN_IP + ":8153
         //--loglevel 5
 
-        Log.d(TAG, "Let's send FD to tun2socks");
+        MyLog.d(TAG, "Let's send FD to tun2socks");
         LocalSocket clientSocket = new LocalSocket();
         try {
             Thread.sleep(500); //Let's wait just a little bit before looking for file
@@ -283,7 +313,7 @@ public class Util {
             clientSocket.connect(new LocalSocketAddress(localSocksFile, LocalSocketAddress.Namespace.FILESYSTEM));
             if(!clientSocket.isConnected())
             {
-                Log.e(TAG,"Unable to connect to localSocksFile ["+localSocksFile+"]");
+                MyLog.e(TAG,"Unable to connect to localSocksFile ["+localSocksFile+"]");
                 return false;
             }
 
@@ -297,13 +327,13 @@ public class Util {
 
         } catch (IOException e) {
             e.printStackTrace();
-            Log.e(TAG,"Unable to connect to localSocksFile ["+localSocksFile+"]");
+            MyLog.e(TAG,"Unable to connect to localSocksFile ["+localSocksFile+"]");
             return false;
         } catch (InterruptedException e) {
             e.printStackTrace();
             return false;
         }
-        Log.d(TAG, "Done tun2socks RUN");
+        MyLog.d(TAG, "Done tun2socks RUN");
         return true;
     }
 
@@ -312,7 +342,7 @@ public class Util {
         String localSSHfd = BASE + "/sshfd_file";
         int sshfd = 0;
 
-        Log.d(TAG, "Let's get sshfd");
+        MyLog.d(TAG, "Let's get sshfd");
         LocalSocket clientSocket = new LocalSocket();
         try {
             LocalSocketAddress localAdd = new LocalSocketAddress(localSSHfd, LocalSocketAddress.Namespace.FILESYSTEM);
@@ -330,7 +360,7 @@ public class Util {
 
             if(!clientSocket.isConnected())
             {
-                Log.e(TAG,"Unable to connect to localSSHfd [" + localSSHfd + "]");
+                MyLog.e(TAG,"Unable to connect to localSSHfd [" + localSSHfd + "]");
                 //Return an invalid sshfd
                 return sshfd;
             }
@@ -355,16 +385,17 @@ public class Util {
 
         } catch (Exception e) {
             e.printStackTrace();
-            Log.e(TAG, "Unable to connect to localSSHfd [" + localSSHfd + "]");
+            MyLog.e(TAG, "Unable to connect to localSSHfd [" + localSSHfd + "]");
             return sshfd;
         }
 
-        Log.d(TAG,"Got SSHfd ["+sshfd+"]");
+        MyLog.d(TAG,"Got SSHfd ["+sshfd+"]");
         return sshfd;
     }
 
     protected static void startKi4aVPN(Context context, String prefix)
     {
+        MyLog.d(TAG, "Util.startVPN");
         Intent intentVpn = new Intent(context,ki4aVPNService.class);
         intentVpn.putExtra(prefix + ".ACTION",ki4aVPNService.FLAG_VPN_START);
 
@@ -373,6 +404,7 @@ public class Util {
 
     protected static void stopKi4aVPN(Context context, String prefix)
     {
+        MyLog.d(TAG, "Util.stopVPN");
         Intent intentVpn = new Intent(context,ki4aVPNService.class);
         intentVpn.putExtra(prefix + ".ACTION",ki4aVPNService.FLAG_VPN_STOP);
 
@@ -385,8 +417,10 @@ public class Util {
         // Notify Service about the connection failed
         // SSH may be hanged waiting for us, so let's kill it (and wait for reconnect if necessary)
         // tun2socks may need cleanup
-        Util.runChainFireCommand(BASE + BASE_BIN + "/busybox killall -9 ssh;" +
-                        BASE + BASE_BIN + "/busybox killall -9 tun2socks", true);
+        Util.runChainFireCommand(BASE + BASE_BIN + "/busybox killall -9 korkscrew;" + // Stop korkscrew
+                BASE + BASE_BIN + "/busybox killall -9 ssh;" + // Stop SSH
+                BASE + BASE_BIN + "/busybox killall -9 tun2socks" + //Stop tun2socks
+                BASE + BASE_BIN + "/busybox killall pdnsd", true); // Stop DNS redirect
     }
 
     protected static void reportRevoked(Context context) {
@@ -396,6 +430,11 @@ public class Util {
             Intent intent = new Intent(context, ki4aService.class);
             context.startService(intent);
         }
+    }
+
+    protected static boolean isKeyEncrypted(String key)
+    {
+        return key.contains("ENCRYPTED");
     }
 
 }

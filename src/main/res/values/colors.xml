@@ -8,6 +8,7 @@
     <color name="colorTextDarkBackgroundDisabled">#404040</color>
     <color name="colorMiddleForeground">#a0a0a0</color>
     <color name="colorDarkBackground">#333333</color>
+    <color name="colorDarkButton">#555555</color>
     <color name="colorMiddleBackground">#a0a0a0</color>
     <color name="colorTransparent">#00FFFFFF</color>
 </resources>

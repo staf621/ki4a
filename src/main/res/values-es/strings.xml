@@ -33,8 +33,12 @@
     <string name="pref_title_ssh_password">Contraseña</string>
     <string name="pref_default_ssh_password"></string>
 
+    <string name="pref_title_ask_pass">Preguntar contraseña al conectar</string>
+    <string name="pref_summary_ask_pass"></string>
+
     <string name="pref_title_ssh_key">Llave privada</string>
     <string name="pref_default_ssh_key"></string>
+    <string name="pref_summary_ssh_key">Formato OpenSSH</string>
 
     <string name="pref_title_key">Utilizar llave privada</string>
     <string name="pref_summary_key">En vez de password</string>
@@ -60,5 +64,35 @@
 
     <string name="not_root_access">No se puede obtener permisos de Root</string>
     <string name="pref_title_other_section">Otras opciones</string>
+
+    <string name="pref_about">Acerca de</string>
+    <string name="application_log">Bitácora de la Aplicación</string>
+    <string name="str_connect">Conectar</string>
+    <string name="str_key_passphrase">Frase de contraseña de la llave privada</string>
+    <string name="str_import">Importar</string>
+    <string name="str_incorrect_password">Contraseña incorrecta</string>
+    <string name="str_failed_to_connect">Error al conectar</string>
+
+    <string name="pref_title_dns">Habilitar Reenvío de DNS</string>
+    <string name="pref_title_dns_server">Servidor DNS (por defecto: 8.8.8.8)</string>
+    <string name="pref_default_dns_server">8.8.8.8</string>
+    <string name="pref_title_forwarding_section">Opciones de Reenvío</string>
+
+    <string name="pref_forward">Reenvío de puertos</string>
+    <string name="forward_src_port">P. Origen</string>
+    <string name="forward_dest_host">Host Destino</string>
+    <string name="forward_dest_port">P. Dest</string>
+    <string name="forward_local">Local</string>
+    <string name="forward_remote">Remoto</string>
+
+    <string name="route_text">Ruta (e.g. 0.0.0.0)</string>
+    <string name="route_prefix_text">Prefix length</string>
+
+    <string name="pref_all_traffic">Enviar todo el tráfico sobre VPN</string>
+    <string name="pref_specific_routes">Mandar subnets específicas</string>
+
+    <string name="refresh_log">Actualizar</string>
+    <string name="copy_log">Copiar</string>
+    <string name="email_log">Enviar por correo</string>
 
 </resources>

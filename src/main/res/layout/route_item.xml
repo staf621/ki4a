@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:layout_marginTop="10dp">
+
+    <EditText
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/route_address"
+        android:hint="@string/route_text"
+        android:minWidth="200dip"
+        android:maxWidth="200dip"
+        android:inputType="textNoSuggestions"
+        android:textColor="@color/colorTextDarkBackground"
+        android:textColorHint="@color/colorTextDarkBackgroundSecondary" />
+
+    <EditText
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/prefix_length"
+        android:hint="@string/route_prefix_text"
+        android:minWidth="120dip"
+        android:maxWidth="120dip"
+        android:inputType="number"
+        android:singleLine="true"
+        android:textColor="@color/colorTextDarkBackground"
+        android:textColorHint="@color/colorTextDarkBackgroundSecondary"
+        android:layout_toRightOf="@+id/route_address" />
+
+    <Button
+        style="?android:attr/buttonStyleSmall"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/delete_button"
+        android:background="@android:drawable/ic_menu_delete"
+        android:layout_alignParentRight="true"
+        android:layout_marginTop="10dp"/>
+
+
+</RelativeLayout>
