@@ -1,0 +1,98 @@
+<resources>
+    <string name="app_name">Ki4a</string>
+    <string name="str_config">Estat</string>
+    <string name="title_activity_settings">Preferències</string>
+
+    <string name="pref_header_general">General</string>
+
+    <string name="pref_title_compress">Habilitar Compressió</string>
+
+    <string name="pref_title_proxy">Habilitar servidor proxy</string>
+
+    <string name="pref_title_cellular">Mode de xarxa de dades mòbil</string>
+    <string name="pref_summary_cellular">Deshabilitar WiFi al connectar i fer servir l'estat de la xarxa mòbil per reconnectar</string>
+    <string name="pref_title_auto_reconnect">Reconnectar automàticament</string>
+
+    <string name="pref_title_airplane">Encendre/Apagar mode avió</string>
+    <string name="pref_summary_airplane">Alternar l'estat del mode avió per reconnectar la xarxa mòbil (Calen permisos de Root!)</string>
+
+    <string name="pref_title_iptables">Utilitzar iptables en lloc de VPN</string>
+    <string name="pref_summary_iptables">Necessita permisos de Root!</string>
+
+    <string name="pref_title_ssh_section">Servidor SSH</string>
+
+    <string name="pref_title_ssh_server">Adreça</string>
+    <string name="pref_default_ssh_server"></string>
+
+    <string name="pref_title_ssh_port">Port (per defecte: 22)</string>
+    <string name="pref_default_ssh_port">22</string>
+
+    <string name="pref_title_ssh_username">Usuari</string>
+    <string name="pref_default_ssh_username"></string>
+
+    <string name="pref_title_ssh_password">Contrassenya</string>
+    <string name="pref_default_ssh_password"></string>
+
+    <string name="pref_title_ask_pass">Preguntar contrassenya al connectar</string>
+    <string name="pref_summary_ask_pass"></string>
+
+    <string name="pref_title_ssh_key">Clau privada</string>
+    <string name="pref_default_ssh_key"></string>
+    <string name="pref_summary_ssh_key">Format OpenSSH</string>
+
+    <string name="pref_title_key">Utilitzar clau privada</string>
+    <string name="pref_summary_key">En lloc de contrassenya</string>
+
+    <string name="pref_title_proxy_section">Proxy HTTP</string>
+
+    <string name="pref_title_proxy_host">Adreça</string>
+    <string name="pref_default_proxy_host"></string>
+
+    <string name="pref_title_proxy_port">Port (per defecte: 80)</string>
+    <string name="pref_default_proxy_port">80</string>
+
+    <string name="pref_title_proxy_header">Http Headers</string>
+    <string name="pref_default_proxy_header"></string>
+    <string name="pref_summary_proxy_header">Les capçaleres HTTP són enviades al proxy després de la capçalera CONNECT i abans del salut SSH</string>
+
+    <string name="text_status_initializing">Iniciant...</string>
+    <string name="text_status_connected">Connectat</string>
+    <string name="text_status_disconnected">Desconnectat</string>
+    <string name="text_status_reconnecting">Reconnectant...</string>
+    <string name="text_status_connecting">Connectant...</string>
+    <string name="text_status_empty"/>
+
+    <string name="not_root_access">No es poden obtenir permisos de Root</string>
+    <string name="pref_title_other_section">Altres opcions</string>
+
+    <string name="pref_about">Sobre...</string>
+    <string name="application_log">Canvis a l'aplicació</string>
+    <string name="str_connect">Connectar</string>
+    <string name="str_key_passphrase">Paraula de pas de la clau privada</string>
+    <string name="str_import">Importar</string>
+    <string name="str_incorrect_password">Contrassenya incorrecta</string>
+    <string name="str_failed_to_connect">Error al connectar</string>
+
+    <string name="pref_title_dns">Habilitar redirecció de DNS</string>
+    <string name="pref_title_dns_server">Servidor DNS (per defecte: 8.8.8.8)</string>
+    <string name="pref_default_dns_server">8.8.8.8</string>
+    <string name="pref_title_forwarding_section">Opcions de redirecció</string>
+
+    <string name="pref_forward">Redirecció de ports</string>
+    <string name="forward_src_port">P. Origen</string>
+    <string name="forward_dest_host">Host Destí</string>
+    <string name="forward_dest_port">P. Dest</string>
+    <string name="forward_local">Local</string>
+    <string name="forward_remote">Remot</string>
+
+    <string name="route_text">Ruta (e.g. 0.0.0.0)</string>
+    <string name="route_prefix_text">Longitud prefix</string>
+
+    <string name="pref_all_traffic">Enviar todo el tràfic sobre VPN</string>
+    <string name="pref_specific_routes">Enviar subxarxes específiques</string>
+
+    <string name="refresh_log">Actualitzar</string>
+    <string name="copy_log">Copiar</string>
+    <string name="email_log">Enviar per correu</string>
+
+</resources>
