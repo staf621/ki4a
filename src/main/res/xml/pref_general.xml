@@ -128,6 +128,10 @@
         android:title="@string/pref_title_other_section"
         android:layout="@layout/preference_divider" />
 
+    <SwitchPreference
+        android:defaultValue="true"
+        android:key="notification_switch"
+        android:title="@string/pref_title_notifications" />
 
     <SwitchPreference
         android:defaultValue="false"
@@ -151,6 +155,20 @@
         android:key="iptables_switch"
         android:title="@string/pref_title_iptables"
         android:summary="@string/pref_summary_iptables" />
+
+    <SwitchPreference
+        android:defaultValue="true"
+        android:key="verify_internet_switch"
+        android:title="@string/pref_title_verify_internet"
+        android:summary="@string/pref_summary_verify_internet" />
+
+    <EditTextPreference
+        android:defaultValue="@string/pref_default_verify_host"
+        android:key="verify_host_text"
+        android:maxLines="1"
+        android:selectAllOnFocus="true"
+        android:singleLine="true"
+        android:title="@string/pref_title_verify_host" />
 
     <Preference
         android:key="log_button"

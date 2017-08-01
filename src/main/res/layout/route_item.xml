@@ -11,7 +11,8 @@
         android:hint="@string/route_text"
         android:minWidth="200dip"
         android:maxWidth="200dip"
-        android:inputType="textNoSuggestions"
+        android:inputType="number|numberDecimal"
+        android:digits="0123456789."
         android:textColor="@color/colorTextDarkBackground"
         android:textColorHint="@color/colorTextDarkBackgroundSecondary" />
 

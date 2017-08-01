@@ -123,6 +123,10 @@ public class ki4aService extends Service {
 
         @Override
         public void run() {
+            boolean verify_internet_switch = PreferenceManager.
+                    getDefaultSharedPreferences(myContext).
+                    getBoolean("verify_internet_switch", true);
+
             MyLog.d(Util.TAG,"Starting new wait4connection");
             int i;
 
@@ -142,10 +146,20 @@ public class ki4aService extends Service {
             for (i = 0; i < MAX_RETRY; i++) {
                 if (current_status == Util.STATUS_DISCONNECT) return; //We disconected
                 if(Thread.currentThread().isInterrupted()) return;
-                MyLog.d(Util.TAG, "Wait4connection: verifying connectivity...");
-                if (Util.isOnline(myContext)) {
-                    reportConnected();
-                    return;
+
+                if(verify_internet_switch) {
+                    MyLog.d(Util.TAG, "Wait4connection: verifying connectivity...");
+                    if (Util.isOnline(myContext)) {
+                        reportConnected();
+                        return;
+                    }
+                }
+                else {
+                    MyLog.d(Util.TAG, "Wait4connection: verifying if socks proxy is open...");
+                    if(Util.isSocksOpen(myContext)) {
+                        reportConnected();
+                        return;
+                    }
                 }
 
                 try {
@@ -205,15 +219,26 @@ public class ki4aService extends Service {
                 String server_text = preferences.getString("server_text", "");
                 String user_text = preferences.getString("user_text", "");
                 String password_text = preferences.getString("password_text", "");
-                int port_number = Integer.parseInt(preferences.getString("server_port", "22"));
                 String proxy_host = preferences.getString("proxy_host", "");
-                int proxy_port = Integer.parseInt(preferences.getString("proxy_port", "80"));
                 boolean compress = preferences.getBoolean("compress_switch", false);
-                boolean proxy = preferences.getBoolean("proxy_switch",false);
+                boolean proxy = preferences.getBoolean("proxy_switch", false);
                 boolean iptables_switch = preferences.getBoolean("iptables_switch", false);
                 boolean dns_switch = preferences.getBoolean("dns_switch",true);
                 String dns_server = preferences.getString("dns_server", GOOGLE_DNS);
                 String forward_string = ForwardList.getForwardString(myContext);
+                int port_number = 22;
+                int proxy_port = 80;
+
+                try {
+                    port_number = Integer.parseInt(preferences.getString("server_port", "22"));
+                } catch (NumberFormatException e) {
+                    MyLog.e(Util.TAG,"Error parsing ssh port number, using default (22)");
+                }
+                try {
+                    proxy_port = Integer.parseInt(preferences.getString("proxy_port", "80"));
+                } catch (NumberFormatException e) {
+                    MyLog.e(Util.TAG,"Error parsing proxy port number, using default (80)");
+                }
 
                 //if ask_pass or private encrypted key we should get pass here
                 if(ask_pass || enc_ssh_key) {
@@ -547,21 +572,23 @@ public class ki4aService extends Service {
     }
 
     protected void showAToast(String message, boolean volatile_notify) {
-        Message msg = handler.obtainMessage();
-        msg.obj = message;
-        handler.sendMessage(msg);
+        boolean notification_switch = preferences.getBoolean("notification_switch", true);
+        if(notification_switch) {
+            Message msg = handler.obtainMessage();
+            msg.obj = message;
+            handler.sendMessage(msg);
 
-        MyLog.d(Util.TAG, message);
+            MyLog.d(Util.TAG, message);
 
-        if(volatile_notify)
-        {
-            // Any notification Id between 10 and 10000000
-            int notifyId = (new Random()).nextInt(9999990) + 10;
+            if (volatile_notify) {
+                // Any notification Id between 10 and 10000000
+                int notifyId = (new Random()).nextInt(9999990) + 10;
 
-            // Volatile Notification for wearables
-            notification.setContentText(message);
-            notificationManager.notify(notifyId, notification.build());
-            notificationManager.cancel(notifyId);
+                // Volatile Notification for wearables
+                notification.setContentText(message);
+                notificationManager.notify(notifyId, notification.build());
+                notificationManager.cancel(notifyId);
+            }
         }
     }
 }

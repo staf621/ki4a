@@ -2,14 +2,11 @@ package com.staf621.ki4a;
 
 
 import android.annotation.TargetApi;
-import android.app.AlertDialog;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.res.Configuration;
 import android.os.Build;
 import android.os.Bundle;
-import android.preference.EditTextPreference;
 import android.preference.ListPreference;
 import android.preference.Preference;
 import android.preference.PreferenceActivity;
@@ -56,6 +53,7 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
     protected static Preference route_switch;
     protected static Preference route_button;
     protected static Preference dns_server;
+    protected static Preference verify_host_text;
     protected static Context myContext;
 
 
@@ -209,6 +207,16 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
                     route_button.setEnabled(true);
                 }
             }
+            else if(preference.getKey().equals("verify_internet_switch"))
+            {
+                if((boolean) value) {
+                    verify_host_text.setEnabled(true);
+                }
+                else
+                {
+                    verify_host_text.setEnabled(false);
+                }
+            }
             return true;
         }
     };
@@ -339,6 +347,7 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
             dns_server = findPreference("dns_server");
             route_switch = findPreference("route_switch");
             route_button = findPreference("route_button");
+            verify_host_text = findPreference("verify_host_text");
 
             bindPreferenceSummaryToValue(findPreference("server_text"));
             bindPreferenceSummaryToValue(findPreference("server_port"));
@@ -348,6 +357,7 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
             bindPreferenceSummaryToValue(proxy_header);
             bindPreferenceSummaryToValue(ssh_key);
             bindPreferenceSummaryToValue(dns_server);
+            bindPreferenceSummaryToValue(verify_host_text);
 
             bindPreferenceEnabler(key_switch);
             bindPreferenceEnabler(ssh_ask_pass);
@@ -356,6 +366,7 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
             bindPreferenceEnabler(findPreference("proxy_switch"));
             bindPreferenceEnabler(findPreference("cellular_switch"));
             bindPreferenceEnabler(findPreference("dns_switch"));
+            bindPreferenceEnabler(findPreference("verify_internet_switch"));
 
             //Enable/Disable iptables switch when connected/disconnected
             if(ki4aService.current_status==Util.STATUS_DISCONNECT) iptables_switch.setEnabled(true);

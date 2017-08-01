@@ -47,6 +47,12 @@ public class ForwardActivity extends AppCompatActivity {
 
     @Override
     public void onBackPressed() {
+        //Let's wait a little bit for on focus callbacks to be executed
+        try {
+            Thread.sleep(500);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
         ForwardList.saveForwardInfo(getApplicationContext());
         super.onBackPressed();
     }

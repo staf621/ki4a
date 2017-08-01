@@ -12,6 +12,7 @@
     <string name="pref_title_cellular">Modo red de datos móvil</string>
     <string name="pref_summary_cellular">Deshabilitar WiFi al conectar y usar el estado de la red móvil para reconectar</string>
     <string name="pref_title_auto_reconnect">Reconectar automáticamente</string>
+    <string name="pref_title_notifications">Mostrar notificaciones</string>
 
     <string name="pref_title_airplane">Prender/Apagar modo avión</string>
     <string name="pref_summary_airplane">Alternar el estado del modo avión para reconectar la red móvil (Necesita permisos de Root!)</string>
@@ -85,6 +86,11 @@
     <string name="forward_local">Local</string>
     <string name="forward_remote">Remoto</string>
 
+    <string name="pref_title_verify_internet">Comprobar conectividad a internet</string>
+    <string name="pref_summary_verify_internet">Conectandose a un servidor http</string>
+    <string name="pref_default_verify_host">http://google.com</string>
+    <string name="pref_title_verify_host">Servidor para verificar conexión</string>
+
     <string name="route_text">Ruta (e.g. 0.0.0.0)</string>
     <string name="route_prefix_text">Prefix length</string>
 
@@ -94,5 +100,7 @@
     <string name="refresh_log">Actualizar</string>
     <string name="copy_log">Copiar</string>
     <string name="email_log">Enviar por correo</string>
+
+    <string name="add_widget">Add widget</string>
 
 </resources>

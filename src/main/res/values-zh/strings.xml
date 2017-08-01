@@ -12,6 +12,7 @@
     <string name="pref_title_cellular">蜂窝数据模式</string>
     <string name="pref_summary_cellular">自动关闭WIFI 并且使用蜂窝网络重新连接</string>
     <string name="pref_title_auto_reconnect">自动重连</string>
+    <string name="pref_title_notifications">Display notifications</string>
 
     <string name="pref_title_airplane">切换飞行模式</string>
     <string name="pref_summary_airplane">切换飞行模式来重新连接蜂窝网络（需要root权限）</string>
@@ -66,33 +67,40 @@
     <string name="pref_title_other_section">其他选择</string>
 
     <string name="pref_about">关于</string>
-    <string name="application_log">Application Log</string>
+    <string name="application_log">应用程序日志</string>
     <string name="str_connect">连</string>
     <string name="str_key_passphrase">私钥密码</string>
     <string name="str_import">进口</string>
     <string name="str_incorrect_password">密码不正确</string>
-    <string name="str_failed_to_connect">Failed to connect</string>
+    <string name="str_failed_to_connect">连接失败</string>
 
-    <string name="pref_title_dns">Enable DNS Forwarding</string>
-    <string name="pref_title_dns_server">DNS Server (default: 8.8.8.8)</string>
+    <string name="pref_title_dns">启用DNS转发</string>
+    <string name="pref_title_dns_server">DNS服务器 (默认: 8.8.8.8)</string>
     <string name="pref_default_dns_server">8.8.8.8</string>
-    <string name="pref_title_forwarding_section">Forwarding options</string>
+    <string name="pref_title_forwarding_section">转发选项</string>
 
     <string name="pref_forward">转发端口</string>
-    <string name="forward_src_port">Src Port</string>
-    <string name="forward_dest_host">Destination Host</string>
-    <string name="forward_dest_port">Dst Port</string>
+    <string name="forward_src_port">源端口</string>
+    <string name="forward_dest_host">目标主机</string>
+    <string name="forward_dest_port">目的端口</string>
     <string name="forward_local">本地</string>
     <string name="forward_remote">远程</string>
 
-    <string name="route_text">Route (e.g. 0.0.0.0)</string>
-    <string name="route_prefix_text">Prefix length</string>
+    <string name="pref_title_verify_internet">验证Internet连接</string>
+    <string name="pref_summary_verify_internet">连接到HTTP服务器</string>
+    <string name="pref_default_verify_host">http://www.baidu.com/</string>
+    <string name="pref_title_verify_host">连接服务器检查</string>
 
-    <string name="pref_all_traffic">Send all traffic over VPN</string>
-    <string name="pref_specific_routes">Route specific subnets</string>
+    <string name="route_text">路线 (e.g. 0.0.0.0)</string>
+    <string name="route_prefix_text">前缀长度</string>
 
-    <string name="refresh_log">Refresh</string>
-    <string name="copy_log">Copy</string>
-    <string name="email_log">Send e-mail</string>
+    <string name="pref_all_traffic">发送所有流量通过VPN</string>
+    <string name="pref_specific_routes">路线特定子网</string>
+
+    <string name="refresh_log">刷新</string>
+    <string name="copy_log">复制</string>
+    <string name="email_log">发电子邮件</string>
+
+    <string name="add_widget">Add widget</string>
 
 </resources>

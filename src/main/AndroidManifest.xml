@@ -32,16 +32,14 @@
         <activity
             android:name=".SettingsActivity"
             android:label="@string/title_activity_settings" />
-
         <activity
             android:name=".ForwardActivity"
             android:label="@string/pref_forward"
-            android:windowSoftInputMode="adjustPan"/>
-
+            android:windowSoftInputMode="adjustPan" />
         <activity
             android:name=".RouteActivity"
             android:label="@string/pref_specific_routes"
-            android:windowSoftInputMode="adjustPan"/>
+            android:windowSoftInputMode="adjustPan" />
 
         <service
             android:name=".ki4aService"
@@ -64,13 +62,26 @@
 
         <activity
             android:name=".AboutActivity"
-            android:label="@string/pref_about"/>
-
+            android:label="@string/pref_about" />
         <activity
             android:name=".ShowLogActivity"
-            android:label="@string/application_log"/>
+            android:label="@string/application_log" />
+        <activity
+            android:name=".KeyImport"
+            android:launchMode="singleTop" />
 
-        <activity android:name=".KeyImport" android:launchMode="singleTop" />
+        <receiver android:name=".ki4aWidget">
+            <intent-filter>
+                <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
+            </intent-filter>
+            <intent-filter>
+                <action android:name="ki4aRefresh"/>
+            </intent-filter>
+
+            <meta-data
+                android:name="android.appwidget.provider"
+                android:resource="@xml/ki4a_widget_info" />
+        </receiver>
     </application>
 
 </manifest>

@@ -8,6 +8,7 @@ import android.net.LocalSocket;
 import android.net.LocalSocketAddress;
 import android.net.NetworkInfo;
 import android.net.wifi.WifiManager;
+import android.preference.PreferenceManager;
 import android.telephony.TelephonyManager;
 
 import java.io.File;
@@ -19,6 +20,7 @@ import java.io.OutputStream;
 import java.lang.reflect.Method;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
+import java.net.Socket;
 import java.net.URL;
 
 import eu.chainfire.libsuperuser.Shell;
@@ -36,6 +38,7 @@ public class Util {
     public static String socksVPN_IP = "26.26.26.2";
     public static int tunVPN_mask_num = 24;
     public static String tunVPN_mask = "255.255.255.0";
+    public static String localhost_IP = "127.0.0.1";
     public static int localSocksPort = 7777;
     public static int tunVPN_MTU = 1500;
 
@@ -129,9 +132,15 @@ public class Util {
     {
         ConnectivityManager cm = (ConnectivityManager) context.getSystemService(context.CONNECTIVITY_SERVICE);
         NetworkInfo netInfo = cm.getActiveNetworkInfo();
+        //"http://google.com"
+        String url_str = PreferenceManager.
+                            getDefaultSharedPreferences(context).
+                            getString("verify_host_text",
+                                        context.getString(R.string.pref_default_verify_host));
+
         if (netInfo != null && netInfo.isConnected()) {
             try {
-                URL url = new URL("http://google.com");
+                URL url = new URL(url_str);
                 HttpURLConnection urlc = (HttpURLConnection) url.openConnection();
                 urlc.setConnectTimeout(2000);
                 urlc.connect();
@@ -142,6 +151,28 @@ public class Util {
                 MyLog.i(TAG, "Couldn't connect [Malformed] " + e1.toString());
             } catch (IOException e) {
                 MyLog.i(TAG, "Couldn't connect " + e.toString());
+            }
+        }
+        return false;
+    }
+
+    protected static boolean isSocksOpen(Context context)
+    {
+        ConnectivityManager cm = (ConnectivityManager) context.getSystemService(context.CONNECTIVITY_SERVICE);
+        NetworkInfo netInfo = cm.getActiveNetworkInfo();
+
+        //Util.localSocksPort
+        if (netInfo != null && netInfo.isConnected()) {
+            try {
+                Socket socket = new Socket(localhost_IP,localSocksPort);
+                socket.getInputStream();
+                if(socket.isConnected())
+                {
+                    socket.close();
+                    return true;
+                }
+            } catch (IOException e) {
+                MyLog.i(Util.TAG,"Couldn't connect to local socks proxy");
             }
         }
         return false;

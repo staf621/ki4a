@@ -1,27 +1,28 @@
 <resources>
     <string name="app_name">Ki4a</string>
     <string name="str_config">Estat</string>
-    <string name="title_activity_settings">PreferËncies</string>
+    <string name="title_activity_settings">Prefer√®ncies</string>
 
     <string name="pref_header_general">General</string>
 
-    <string name="pref_title_compress">Habilitar CompressiÛ</string>
+    <string name="pref_title_compress">Habilitar Compressi√≥</string>
 
     <string name="pref_title_proxy">Habilitar servidor proxy</string>
 
-    <string name="pref_title_cellular">Mode de xarxa de dades mÚbil</string>
-    <string name="pref_summary_cellular">Deshabilitar WiFi al connectar i fer servir l'estat de la xarxa mÚbil per reconnectar</string>
-    <string name="pref_title_auto_reconnect">Reconnectar autom‡ticament</string>
+    <string name="pref_title_cellular">Mode de xarxa de dades m√≤bil</string>
+    <string name="pref_summary_cellular">Deshabilitar WiFi al connectar i fer servir l\'estat de la xarxa m√≤bil per reconnectar</string>
+    <string name="pref_title_auto_reconnect">Reconnectar autom√†ticament</string>
+    <string name="pref_title_notifications">Mostra notificacions</string>
 
-    <string name="pref_title_airplane">Encendre/Apagar mode aviÛ</string>
-    <string name="pref_summary_airplane">Alternar l'estat del mode aviÛ per reconnectar la xarxa mÚbil (Calen permisos de Root!)</string>
+    <string name="pref_title_airplane">Encendre/Apagar mode avi√≥</string>
+    <string name="pref_summary_airplane">Alternar l\'estat del mode avi√≥ per reconnectar la xarxa m√≤bil (Calen permisos de Root!)</string>
 
     <string name="pref_title_iptables">Utilitzar iptables en lloc de VPN</string>
     <string name="pref_summary_iptables">Necessita permisos de Root!</string>
 
     <string name="pref_title_ssh_section">Servidor SSH</string>
 
-    <string name="pref_title_ssh_server">AdreÁa</string>
+    <string name="pref_title_ssh_server">Adre√ßa</string>
     <string name="pref_default_ssh_server"></string>
 
     <string name="pref_title_ssh_port">Port (per defecte: 22)</string>
@@ -45,7 +46,7 @@
 
     <string name="pref_title_proxy_section">Proxy HTTP</string>
 
-    <string name="pref_title_proxy_host">AdreÁa</string>
+    <string name="pref_title_proxy_host">Adre√ßa</string>
     <string name="pref_default_proxy_host"></string>
 
     <string name="pref_title_proxy_port">Port (per defecte: 80)</string>
@@ -53,7 +54,7 @@
 
     <string name="pref_title_proxy_header">Http Headers</string>
     <string name="pref_default_proxy_header"></string>
-    <string name="pref_summary_proxy_header">Les capÁaleres HTTP sÛn enviades al proxy desprÈs de la capÁalera CONNECT i abans del salut SSH</string>
+    <string name="pref_summary_proxy_header">Les cap√ßaleres HTTP s√≥n enviades al proxy despr√©s de la cap√ßalera CONNECT i abans del salut SSH</string>
 
     <string name="text_status_initializing">Iniciant...</string>
     <string name="text_status_connected">Connectat</string>
@@ -66,21 +67,21 @@
     <string name="pref_title_other_section">Altres opcions</string>
 
     <string name="pref_about">Sobre...</string>
-    <string name="application_log">Canvis a l'aplicaciÛ</string>
+    <string name="application_log">Canvis a l\'aplicaci√≥</string>
     <string name="str_connect">Connectar</string>
     <string name="str_key_passphrase">Paraula de pas de la clau privada</string>
     <string name="str_import">Importar</string>
     <string name="str_incorrect_password">Contrassenya incorrecta</string>
     <string name="str_failed_to_connect">Error al connectar</string>
 
-    <string name="pref_title_dns">Habilitar redirecciÛ de DNS</string>
+    <string name="pref_title_dns">Habilitar redirecci√≥ de DNS</string>
     <string name="pref_title_dns_server">Servidor DNS (per defecte: 8.8.8.8)</string>
     <string name="pref_default_dns_server">8.8.8.8</string>
-    <string name="pref_title_forwarding_section">Opcions de redirecciÛ</string>
+    <string name="pref_title_forwarding_section">Opcions de redirecci√≥</string>
 
-    <string name="pref_forward">RedirecciÛ de ports</string>
+    <string name="pref_forward">Redirecci√≥ de ports</string>
     <string name="forward_src_port">P. Origen</string>
-    <string name="forward_dest_host">Host DestÌ</string>
+    <string name="forward_dest_host">Host Dest√≠</string>
     <string name="forward_dest_port">P. Dest</string>
     <string name="forward_local">Local</string>
     <string name="forward_remote">Remot</string>
@@ -88,11 +89,17 @@
     <string name="route_text">Ruta (e.g. 0.0.0.0)</string>
     <string name="route_prefix_text">Longitud prefix</string>
 
-    <string name="pref_all_traffic">Enviar todo el tr‡fic sobre VPN</string>
-    <string name="pref_specific_routes">Enviar subxarxes especÌfiques</string>
+    <string name="pref_all_traffic">Enviar todo el tr√†fic sobre VPN</string>
+    <string name="pref_specific_routes">Enviar subxarxes espec√≠fiques</string>
+
+    <string name="pref_title_verify_internet">Verificar la connectivitat a Internet</string>
+    <string name="pref_summary_verify_internet">Connexi√≥ amb un servidor HTTP</string>
+    <string name="pref_default_verify_host">http://google.com</string>
+    <string name="pref_title_verify_host">Servidor de comprovaci√≥ de connectivitat</string>
 
     <string name="refresh_log">Actualitzar</string>
     <string name="copy_log">Copiar</string>
     <string name="email_log">Enviar per correu</string>
 
+    <string name="add_widget">Afegir panell</string>
 </resources>

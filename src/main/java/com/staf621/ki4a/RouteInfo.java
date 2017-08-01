@@ -3,6 +3,9 @@ package com.staf621.ki4a;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.net.Inet4Address;
+import java.net.InetAddress;
+
 public class RouteInfo {
     private String route_address;
     private String prefix_length;
@@ -50,6 +53,21 @@ public class RouteInfo {
     }
 
     public String getRoute_address() {
+        try {
+            int prefix = Integer.parseInt(this.prefix_length);
+            if (prefix >= 0 && prefix <= 32) {
+                Inet4Address address = (Inet4Address) InetAddress.getByName(this.route_address);
+                byte[] bytes = address.getAddress();
+                int mask = 0xffffffff << (32 - prefix);
+                bytes[0] = (byte)(bytes[0] & (mask >> 24));
+                bytes[1] = (byte)(bytes[1] & (mask >> 16));
+                bytes[2] = (byte)(bytes[2] & (mask >> 8));
+                bytes[3] = (byte)(bytes[3] & (mask));
+                InetAddress netAddr = InetAddress.getByAddress(bytes);
+                this.route_address = netAddr.getHostAddress();
+            }
+        }
+        catch (Exception e) {}
         return this.route_address;
     }
 
