@@ -96,50 +96,56 @@ public class ki4aVPNService extends VpnService implements Runnable {
             return;
         }
 
-        Builder builder = new Builder();
-        builder.setSession("ki4a");
-        builder.setMtu(Util.tunVPN_MTU);
-        builder.addAddress(Util.tunVPN_IP, Util.tunVPN_mask_num);
-        SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(this);
-        if(preferences.getBoolean("dns_switch", true)) builder.addDnsServer(preferences.getString("dns_server", "8.8.8.8"));
-        //builder.addRoute("8.8.0.0", 16); //Redirect DNS stuff
+        try {
+            Builder builder = new Builder();
+            builder.setSession("ki4a");
+            builder.setMtu(Util.tunVPN_MTU);
+            builder.addAddress(Util.tunVPN_IP, Util.tunVPN_mask_num);
+            SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(this);
+            if (preferences.getBoolean("dns_switch", true))
+                builder.addDnsServer(preferences.getString("dns_server", "8.8.8.8"));
+            //builder.addRoute("8.8.0.0", 16); //Redirect DNS stuff
 
-        if(preferences.getBoolean("route_switch", true)) {
-            MyLog.d(Util.TAG,"Routing all traffic");
-            builder.addRoute("0.0.0.0", 0); //Redirect all traffic
-        }
-        else {
-            List<RouteInfo> infoList = RouteList.getRoutes(this);
-            for (RouteInfo info : infoList) {
-                try {
-                    if (!info.getRoute_address().isEmpty() && !info.getPrefix_length().isEmpty()) {
-                        MyLog.d(Util.TAG,"Adding route " + info.getRoute_address() + "/" + info.getPrefix_length());
-                        builder.addRoute(info.getRoute_address(), Integer.parseInt(info.getPrefix_length())); //Redirect all traffic
+            if (preferences.getBoolean("route_switch", true)) {
+                MyLog.d(Util.TAG, "Routing all traffic");
+                builder.addRoute("0.0.0.0", 0); //Redirect all traffic
+            } else {
+                List<RouteInfo> infoList = RouteList.getRoutes(this);
+                for (RouteInfo info : infoList) {
+                    try {
+                        if (!info.getRoute_address().isEmpty() && !info.getPrefix_length().isEmpty()) {
+                            MyLog.d(Util.TAG, "Adding route " + info.getRoute_address() + "/" + info.getPrefix_length());
+                            builder.addRoute(info.getRoute_address(), Integer.parseInt(info.getPrefix_length())); //Redirect all traffic
+                        }
+                    } catch (Exception e) {
+                        MyLog.e(Util.TAG, "Fail to Add route " + info.getRoute_address() + "/" + info.getPrefix_length() + " - Skipping");
+                        MyLog.e(Util.TAG, e.getMessage());
                     }
-                } catch (Exception e) {
-                    MyLog.e(Util.TAG,"Fail to Add route " + info.getRoute_address() + "/" + info.getPrefix_length() + " - Skipping");
-                    MyLog.e(Util.TAG,e.getMessage());
+                }
+                if (preferences.getBoolean("dns_switch", true)) {
+                    try {
+                        MyLog.d(Util.TAG, "Adding DNS route " + preferences.getString("dns_server", "8.8.8.8") + "/32");
+                        builder.addRoute(preferences.getString("dns_server", "8.8.8.8"), 32); //Redirect DNS address
+                    } catch (Exception e) {
+                        MyLog.e(Util.TAG, "Fail to Add DNS route " + preferences.getString("dns_server", "8.8.8.8") + "/32 - Skipping");
+                        MyLog.e(Util.TAG, e.getMessage());
+                    }
                 }
             }
-            if(preferences.getBoolean("dns_switch", true)) {
-                try {
-                    MyLog.d(Util.TAG, "Adding DNS route " + preferences.getString("dns_server", "8.8.8.8") + "/32");
-                    builder.addRoute(preferences.getString("dns_server", "8.8.8.8"), 32); //Redirect DNS address
-                } catch (Exception e) {
-                    MyLog.e(Util.TAG,"Fail to Add DNS route " +preferences.getString("dns_server", "8.8.8.8") + "/32 - Skipping");
-                    MyLog.e(Util.TAG,e.getMessage());
-                }
+
+
+            if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.LOLLIPOP)
+                builder.allowFamily(android.system.OsConstants.AF_INET6);
+
+            mInterface = builder.establish();
+
+            if (mInterface == null || !Util.run_tun2socks(mInterface.getFileDescriptor(), PreferenceManager.getDefaultSharedPreferences(this).getBoolean("dns_switch", true))) {
+                // If we can not connect, let's close and destroy everything
+                this.onDestroy();
+                Util.reportDisconnection(this);
             }
-        }
-
-
-        if(android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.LOLLIPOP)
-            builder.allowFamily(android.system.OsConstants.AF_INET6);
-
-        mInterface = builder.establish();
-
-        if (mInterface == null || !Util.run_tun2socks(mInterface.getFileDescriptor(), PreferenceManager.getDefaultSharedPreferences(this).getBoolean("dns_switch", true))) {
-            // If we can not connect, let's close and destroy everything
+        } catch (Exception e) {
+            MyLog.e(Util.TAG,e.toString());
             this.onDestroy();
             Util.reportDisconnection(this);
         }

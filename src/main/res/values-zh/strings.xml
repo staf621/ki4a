@@ -103,4 +103,23 @@
 
     <string name="add_widget">Add widget</string>
 
+    <string name="profile">轮廓</string>
+    <string-array name="profiles">
+        <item>轮廓 1</item>
+        <item>轮廓 2</item>
+        <item>轮廓 3</item>
+        <item>轮廓 4</item>
+        <item>轮廓 5</item>
+    </string-array>
+
+    <string-array name="profiles_values">
+        <item>1</item>
+        <item>2</item>
+        <item>3</item>
+        <item>4</item>
+        <item>5</item>
+    </string-array>
+
+    <string name="pref_title_autoconnect">自动连接</string>
+    <string name="pref_summary_autoconnect">WiFi可用时自动启动</string>
 </resources>

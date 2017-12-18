@@ -102,4 +102,24 @@
     <string name="email_log">Send e-mail</string>
 
     <string name="add_widget">Add widget</string>
+
+    <string name="profile">Profile</string>
+    <string-array name="profiles">
+        <item>Profile 1</item>
+        <item>Profile 2</item>
+        <item>Profile 3</item>
+        <item>Profile 4</item>
+        <item>Profile 5</item>
+    </string-array>
+
+    <string-array name="profiles_values">
+        <item>1</item>
+        <item>2</item>
+        <item>3</item>
+        <item>4</item>
+        <item>5</item>
+    </string-array>
+
+    <string name="pref_title_autoconnect">Auto Connect</string>
+    <string name="pref_summary_autoconnect">Start automatically when WiFi is available</string>
 </resources>

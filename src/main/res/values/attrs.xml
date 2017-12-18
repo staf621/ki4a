@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <declare-styleable name="com.adclient.app.configuration">
+        <attr name="adPlacementKey" format="string"/>
+        <attr name="refreshInterval" format="integer"/>
+        <attr name="adType" format="string"/>
+        <attr name="viewBackground" format="string"/>
+        <attr name="custom" format="string"/>
+        <attr name="adServerUrl" format="string"/>
+        <attr name="textAlign" format="string"/>
+    </declare-styleable>
+</resources>

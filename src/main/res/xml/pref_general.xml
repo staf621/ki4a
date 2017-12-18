@@ -1,5 +1,12 @@
 <PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
 
+    <ListPreference
+        android:key="profile_list"
+        android:entries="@array/profiles"
+        android:entryValues="@array/profiles_values"
+        android:defaultValue="1"
+        android:title="@string/profile" />
+
     <PreferenceCategory
         android:title="@string/pref_title_ssh_section"
         android:layout="@layout/preference_divider"
@@ -149,6 +156,12 @@
         android:key="airplane_switch"
         android:title="@string/pref_title_airplane"
         android:summary="@string/pref_summary_airplane" />
+
+    <SwitchPreference
+        android:defaultValue="false"
+        android:key="autoconnect_switch"
+        android:title="@string/pref_title_autoconnect"
+        android:summary="@string/pref_summary_autoconnect" />
 
     <SwitchPreference
         android:defaultValue="false"

@@ -102,4 +102,24 @@
     <string name="email_log">Enviar per correu</string>
 
     <string name="add_widget">Afegir panell</string>
+
+    <string name="profile">Perfil</string>
+    <string-array name="profiles">
+        <item>Perfil 1</item>
+        <item>Perfil 2</item>
+        <item>Perfil 3</item>
+        <item>Perfil 4</item>
+        <item>Perfil 5</item>
+    </string-array>
+
+    <string-array name="profiles_values">
+        <item>1</item>
+        <item>2</item>
+        <item>3</item>
+        <item>4</item>
+        <item>5</item>
+    </string-array>
+
+    <string name="pref_title_autoconnect">Connexió automàtica</string>
+    <string name="pref_summary_autoconnect">Comenceu automàticament quan hi hagi Wi-Fi disponible</string>
 </resources>

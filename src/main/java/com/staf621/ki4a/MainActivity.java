@@ -23,12 +23,17 @@ import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.TextView;
 
+import com.adclient.android.sdk.listeners.ClientAdListener;
+import com.adclient.android.sdk.view.AbstractAdClientView;
+import com.adclient.android.sdk.view.AdClientView;
+
 public class MainActivity extends AppCompatActivity {
 
     protected static ImageButton button;
     protected static TextView text_status;
     protected static MainActivity myMainActivity;
     protected DataUpdateReceiver dataUpdateReceiver;
+    protected static AdClientView adClientView;
 
     // This Class is called from ki4aService to notify a status change
     private class DataUpdateReceiver extends BroadcastReceiver {
@@ -131,6 +136,31 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
+        adClientView = (AdClientView) findViewById(R.id.adClientView);
+        adClientView.addClientAdListener(new ClientAdListener() {
+            @Override
+            public void onReceivedAd(AbstractAdClientView adClientView) {
+                MyLog.d(Util.TAG, "Ad received callback.");
+            }
+            @Override
+            public void onFailedToReceiveAd(AbstractAdClientView adClientView) {
+                MyLog.d(Util.TAG, "Ad failed to be received callback.");
+            }
+            @Override
+            public void onShowAdScreen(AbstractAdClientView adClientView) {
+                MyLog.d(Util.TAG, "Ad show ad screen callback.");
+            }
+            @Override
+            public void onLoadingAd(AbstractAdClientView adClientView, String
+                    message) {
+                MyLog.d(Util.TAG, "Ad loaded callback.");
+            }
+            @Override
+            public void onClosedAd(AbstractAdClientView adClientView) {
+                MyLog.d(Util.TAG, "Ad closed callback.");
+            }
+        });
+        adClientView.load();
     }
 
     @Override
@@ -151,10 +181,17 @@ public class MainActivity extends AppCompatActivity {
         intentFilter.addAction(ki4aService.REFRESH_STATUS_INTENT);
         intentFilter.addAction(ki4aService.ASK_FOR_PASS_INTENT);
         registerReceiver(dataUpdateReceiver, intentFilter);
+
+        if (adClientView != null) {
+            adClientView.resume();
+        }
     }
 
     @Override
     public void onPause() {
+        if (adClientView != null) {
+            adClientView.pause();
+        }
         super.onPause();
         // Unregister Service Updates
         if (dataUpdateReceiver != null) unregisterReceiver(dataUpdateReceiver);
@@ -163,6 +200,9 @@ public class MainActivity extends AppCompatActivity {
     /** Called when the activity is closed. */
     @Override
     public void onDestroy() {
+        if (adClientView != null) {
+            adClientView.destroy();
+        }
         super.onDestroy();
     }
 
@@ -189,6 +229,9 @@ public class MainActivity extends AppCompatActivity {
         {
             text_status.setText(R.string.text_status_connected);
             button.setImageResource(R.drawable.status_blue);
+            if (adClientView != null) {
+                adClientView.load();
+            }
         }
     }
 

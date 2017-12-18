@@ -3,10 +3,8 @@ package com.staf621.ki4a;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.app.Service;
-import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
-import android.content.IntentFilter;
 import android.content.res.Resources;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -41,6 +39,9 @@ public class ki4aService extends Service {
     protected static int toState = 0;
     protected static final String REFRESH_STATUS_INTENT = "ki4aRefresh";
     protected static final String TOGGLE_STATUS_INTENT = "ki4aStatusToggle";
+    protected static final String TOGGLE_KI4A_INTENT = TOGGLE_STATUS_INTENT;
+    protected static final String START_KI4A_INTENT = "ki4aStatusStart";
+    protected static final String STOP_KI4A_INTENT = "ki4aStatusStop";
     protected static final String ASK_FOR_PASS_INTENT = "ki4aAskForPass";
     protected static final int NOTIFICATION_ID = 7;
     protected static boolean first_connect = true;
@@ -57,7 +58,6 @@ public class ki4aService extends Service {
 
     protected NotificationCompat.Builder notification;
     protected NotificationManager notificationManager;
-    protected DataUpdateReceiver dataUpdateReceiver;
     protected Context myContext;
     protected static SharedPreferences preferences;
 
@@ -67,29 +67,6 @@ public class ki4aService extends Service {
         }
     };
 
-    // This Class is called from other Apps to notify a status change
-    private class DataUpdateReceiver extends BroadcastReceiver {
-        @Override
-        public void onReceive(Context context, Intent intent) {
-            if (intent.getAction().equals(ki4aService.TOGGLE_STATUS_INTENT)) {
-                Intent intentService = new Intent(context, ki4aService.class);
-                if (current_status == Util.STATUS_DISCONNECT)
-                {
-                    ki4aService.current_status = Util.STATUS_CONNECTING;
-                    // Notify MainActivity about status change
-                    sendBroadcast(new Intent(REFRESH_STATUS_INTENT));
-                    ki4aService.toState = Util.STATUS_SOCKS;
-                }
-                else if ( ki4aService.current_status == Util.STATUS_CONNECTING ||
-                        ki4aService.current_status == Util.STATUS_SOCKS
-                        )
-                    ki4aService.toState = Util.STATUS_DISCONNECT;
-
-                // Notify Service about the button being pushed
-                startService(intentService);
-            }
-        }
-    }
 
     protected class Wait4connection extends Thread
     {
@@ -117,8 +94,7 @@ public class ki4aService extends Service {
 
             notificationManager.notify(NOTIFICATION_ID, notification.build());
 
-            // Notify MainActivity about status change
-            sendBroadcast(new Intent(REFRESH_STATUS_INTENT));
+            notifyStatusChange(myContext);
         }
 
         @Override
@@ -276,8 +252,9 @@ public class ki4aService extends Service {
                                     + (iptables_switch ? "" : " --ancillaryfile " + BASE + "/sshfd_file")
                                     + (proxy ? " --proxyhost " + proxy_host
                                     + " --proxyport " + proxy_port + " --desthost %h --destport %p"
-                                    + " --headerfile " + BASE + "/header_file" + "\" -o \"KeepAlive yes\" -o \"ServerAliveInterval 15\""
+                                    + " --headerfile " + BASE + "/header_file" + "\""
                                     : " --directconnection --desthost %h --destport %p\"")
+                                    + " -o \"KeepAlive yes\" -o \"ServerAliveInterval 15\""
                                     + " -o \"StrictHostKeyChecking=no\" -o \"GlobalKnownHostsFile=/dev/null\"", false, true);
                 }
                 // Connection got closed
@@ -328,8 +305,7 @@ public class ki4aService extends Service {
                 current_status = Util.STATUS_CONNECTING; //reconnecting
                 showAToast(getString(R.string.text_status_reconnecting),false);
 
-                // Notify MainActivity about status change
-                sendBroadcast(new Intent(REFRESH_STATUS_INTENT));
+                notifyStatusChange(myContext);
 
                 // If we are on VPN mode, we need to restart it also
                 if (!preferences.getBoolean("iptables_switch", false))
@@ -376,12 +352,6 @@ public class ki4aService extends Service {
                 .setSmallIcon(R.drawable.notification_icon)
                 .setContentIntent(pIntent)
                 .setOngoing(true);
-
-        // Handle toggle status request from other apps
-        dataUpdateReceiver = new DataUpdateReceiver();
-        IntentFilter intentFilter = new IntentFilter();
-        intentFilter.addAction(ki4aService.TOGGLE_STATUS_INTENT);
-        registerReceiver(dataUpdateReceiver, intentFilter);
     }
 
     @Override
@@ -428,7 +398,6 @@ public class ki4aService extends Service {
         Util.runChainFireCommand(BASE + BASE_BIN + "/busybox killall -9 pdnsd", true); //kill DNS
         cleanAll();
 
-        if (dataUpdateReceiver != null) unregisterReceiver(dataUpdateReceiver);
         MyLog.d(Util.TAG, "Destroy service called!");
     }
 
@@ -439,8 +408,8 @@ public class ki4aService extends Service {
         //If we want to use iptables and we do not have root access, we can't connect
         if (iptables_switch && !Util.hasRoot()) {
             current_status = Util.STATUS_DISCONNECT; //Disconnect
-            // Notify MainActivity about status change
-            sendBroadcast(new Intent(REFRESH_STATUS_INTENT));
+            notifyStatusChange(myContext);
+            ki4aQuickSettingsService.updateTile(ki4aQuickSettingsService.tileService);
             showAToast(getString(R.string.not_root_access), false);
             stopForeground(true);
             return;
@@ -512,6 +481,7 @@ public class ki4aService extends Service {
             //I need to ask for pass before trying to create SSH Thread
             // Notify MainActivity about ask for pass
             sendBroadcast(new Intent(ASK_FOR_PASS_INTENT));
+
         }
 
         new Thread(ssht).start();
@@ -522,8 +492,7 @@ public class ki4aService extends Service {
     {
         boolean iptables_switch = preferences.getBoolean("iptables_switch", false);
         current_status = Util.STATUS_DISCONNECT; //Disconnect
-        // Notify MainActivity about status change
-        sendBroadcast(new Intent(REFRESH_STATUS_INTENT));
+        notifyStatusChange(myContext);
         showAToast(getString(R.string.text_status_disconnected), true);
 
         //if we have pass saved, let's erase it unless it's a key passphrase
@@ -568,6 +537,16 @@ public class ki4aService extends Service {
                     BASE + BASE_BIN + "/iptables -t filter -F FORWARD;" +
                     BASE + BASE_BIN + "/iptables -t nat -F POSTROUTING;" +
                     BASE + BASE_BIN + "/iptables -t nat -F PREROUTING", true);
+        }
+    }
+
+    protected static void notifyStatusChange(Context context) {
+        // Notify MainActivity about status change
+        context.sendBroadcast(new Intent(REFRESH_STATUS_INTENT));
+
+        if(android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N) {
+            // Notify QS about status change
+            ki4aQuickSettingsService.updateTile(ki4aQuickSettingsService.tileService);
         }
     }
 

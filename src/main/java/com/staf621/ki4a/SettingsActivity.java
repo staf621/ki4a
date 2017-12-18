@@ -2,8 +2,10 @@ package com.staf621.ki4a;
 
 
 import android.annotation.TargetApi;
+import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.res.Configuration;
 import android.os.Build;
 import android.os.Bundle;
@@ -20,6 +22,7 @@ import android.view.MenuItem;
 import java.io.FileOutputStream;
 import java.io.OutputStream;
 import java.util.List;
+import java.util.Map;
 
 /**
  * A {@link PreferenceActivity} that presents a set of application settings. On
@@ -41,6 +44,7 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
     private static final String TAG = "ki4a";
     protected static String BASE = "/data/data/com.staf621.ki4a/ki4a";
 
+    protected static ListPreference profile_list;
     protected static Preference proxy_host;
     protected static Preference proxy_port;
     protected static Preference proxy_header;
@@ -54,13 +58,75 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
     protected static Preference route_button;
     protected static Preference dns_server;
     protected static Preference verify_host_text;
+    protected static Preference autoconnect;
     protected static Context myContext;
+    protected static Activity activity;
 
 
     private static Preference.OnPreferenceChangeListener sBindPreferenceSummaryToValueListener = new Preference.OnPreferenceChangeListener() {
         @Override
         public boolean onPreferenceChange(Preference preference, Object value) {
             String stringValue = value.toString();
+
+
+            if(preference.getKey().equals("profile_list"))
+            {
+                ListPreference listPreference = (ListPreference) preference;
+                if(!listPreference.getValue().equals(stringValue)) {
+                    //System.out.println("New Profile [" + stringValue+"] Old Profile ["+listPreference.getValue()+"]");
+
+                    /* CHANGE THE PROFILE */
+                    /* First save the old one */
+                    SharedPreferences settings = PreferenceManager
+                            .getDefaultSharedPreferences(preference.getContext());
+                    SharedPreferences profile = preference.getContext().getSharedPreferences("Profile" + listPreference.getValue(), 0);
+                    SharedPreferences.Editor editor = profile.edit();
+
+                    editor.clear();
+                    for (Map.Entry<String, ?> entry : settings.getAll().entrySet()) {
+                        Object v = entry.getValue();
+                        String key = entry.getKey();
+                        if (v instanceof Boolean)
+                            editor.putBoolean(key, ((Boolean) v).booleanValue());
+                        else if (v instanceof Float)
+                            editor.putFloat(key, ((Float) v).floatValue());
+                        else if (v instanceof Integer)
+                            editor.putInt(key, ((Integer) v).intValue());
+                        else if (v instanceof Long)
+                            editor.putLong(key, ((Long) v).longValue());
+                        else if (v instanceof String)
+                            editor.putString(key, ((String) v));
+                    }
+                    editor.commit();
+
+                    /* Now load the new profile into the current one */
+                    SharedPreferences profile_new = preference.getContext().getSharedPreferences("Profile" + stringValue, 0);
+                    SharedPreferences.Editor editor_current = settings.edit();
+
+                    editor_current.clear();
+                    for (Map.Entry<String, ?> entry : profile_new.getAll().entrySet()) {
+                        Object v = entry.getValue();
+                        String key = entry.getKey();
+                        if (v instanceof Boolean)
+                            editor_current.putBoolean(key, ((Boolean) v).booleanValue());
+                        else if (v instanceof Float)
+                            editor_current.putFloat(key, ((Float) v).floatValue());
+                        else if (v instanceof Integer)
+                            editor_current.putInt(key, ((Integer) v).intValue());
+                        else if (v instanceof Long)
+                            editor_current.putLong(key, ((Long) v).longValue());
+                        else if (v instanceof String)
+                            editor_current.putString(key, ((String) v));
+                    }
+                    editor_current.commit();
+
+                    /* Reload the activity */
+                    activity.finish();
+                    activity.overridePendingTransition(0, 0);
+                    activity.startActivity(activity.getIntent());
+                    activity.overridePendingTransition(0, 0);
+                }
+            }
 
             if (preference instanceof ListPreference) {
                 // For list preferences, look up the correct display value in
@@ -168,10 +234,12 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
             {
                 if((boolean) value) {
                     airplane_switch.setEnabled(true);
+                    autoconnect.setEnabled(false);
                 }
                 else
                 {
                     airplane_switch.setEnabled(false);
+                    autoconnect.setEnabled(true);
                 }
             }
             else if(preference.getKey().equals("dns_switch"))
@@ -334,7 +402,9 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
             super.onCreate(savedInstanceState);
             addPreferencesFromResource(R.xml.pref_general);
             setHasOptionsMenu(true);
+            activity = getActivity();
 
+            profile_list = (ListPreference) findPreference("profile_list");
             proxy_host = findPreference("proxy_host");
             proxy_port = findPreference("proxy_port");
             proxy_header = findPreference("proxy_header");
@@ -348,7 +418,9 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
             route_switch = findPreference("route_switch");
             route_button = findPreference("route_button");
             verify_host_text = findPreference("verify_host_text");
+            autoconnect = findPreference("autoconnect_switch");
 
+            bindPreferenceSummaryToValue(profile_list);
             bindPreferenceSummaryToValue(findPreference("server_text"));
             bindPreferenceSummaryToValue(findPreference("server_port"));
             bindPreferenceSummaryToValue(findPreference("user_text"));
@@ -367,10 +439,20 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
             bindPreferenceEnabler(findPreference("cellular_switch"));
             bindPreferenceEnabler(findPreference("dns_switch"));
             bindPreferenceEnabler(findPreference("verify_internet_switch"));
+            bindPreferenceEnabler(autoconnect);
 
-            //Enable/Disable iptables switch when connected/disconnected
-            if(ki4aService.current_status==Util.STATUS_DISCONNECT) iptables_switch.setEnabled(true);
-            else iptables_switch.setEnabled(false);
+            // Enable/Disable iptables switch when connected/disconnected
+            // Also enable/disable profiles
+            if(ki4aService.current_status==Util.STATUS_DISCONNECT)
+            {
+                iptables_switch.setEnabled(true);
+                profile_list.setEnabled(true);
+            }
+            else
+            {
+                iptables_switch.setEnabled(false);
+                profile_list.setEnabled(false);
+            }
 
             Preference button = findPreference("about_button");
             button.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
