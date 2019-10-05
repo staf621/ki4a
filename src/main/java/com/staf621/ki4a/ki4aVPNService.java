@@ -51,6 +51,7 @@ public class ki4aVPNService extends VpnService implements Runnable {
         if (mInterface != null){
             try {
                 mInterface.close();
+                mInterface = null;
             } catch (IOException e) { /* Ignore a close error here */ }
         }
     }
